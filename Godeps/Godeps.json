@@ -1,0 +1,23 @@
+{
+	"ImportPath": "github.com/remind101/shipr",
+	"GoVersion": "go1.2.1",
+	"Deps": [
+		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Rev": "37512bbe41b4cc579cdd706742efc7bf34f94b06"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/martini",
+			"Rev": "d287ef8c57cde8699be90e08acfc91733912d419"
+		},
+		{
+			"ImportPath": "github.com/go-martini/martini",
+			"Comment": "v1.0-rc1-18-g37d6716",
+			"Rev": "37d6716c45efb172cd7074a6f29de02945f17353"
+		},
+		{
+			"ImportPath": "github.com/martini-contrib/binding",
+			"Rev": "3c6304eca9089d5f082b80bf6bbcb8ce1c34c040"
+		}
+	]
+}

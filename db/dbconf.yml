@@ -1,0 +1,7 @@
+development:
+  driver: postgres
+  open: dbname=shipr_dev sslmode=disable
+
+test:
+  driver: postgres
+  open: dbname=shipr_test sslmode=disable
