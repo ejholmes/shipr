@@ -16,6 +16,8 @@ type Job struct {
 	Guid        string
 	Sha         string
 	Environment string
+	Force       bool
+	Description string
 	ExitStatus  *int `db:"exit_status"`
 }
 
