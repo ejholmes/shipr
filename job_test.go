@@ -1,6 +1,36 @@
 package main
 
-import "testing"
+import (
+	"testing"
+	"time"
+)
+
+func testJob(t *testing.T) *Job {
+	job := &Job{Guid: "1234", Sha: "4321", Environment: "production"}
+	err := dbmap.Insert(job)
+	if err != nil {
+		t.Error(err)
+	}
+	return job
+}
+
+func Test_Job_AddLine(t *testing.T) {
+	job := testJob(t)
+
+	l, err := job.AddLine("Foo\n", time.Now())
+	if err != nil {
+		t.Error(err)
+	}
+
+	output, err := job.Output()
+	if err != nil {
+		t.Error(err)
+	}
+
+	if output != l.Output {
+		t.Errorf("Got %v; want %v", output, l.Output)
+	}
+}
 
 func Test_Job_Status(t *testing.T) {
 	exitOk := 0
