@@ -18,8 +18,25 @@ type Job struct {
 	ExitStatus  *int
 }
 
-func (j *Job) AppendOutput(output string, timestamp time.Time) error {
-	// Create a log_lines row
+// LogLine represents a line of log output from the deploy job.
+type LogLine struct {
+	JobID     int `db:"job_id"`
+	Output    string
+	Timestamp time.Time
+}
+
+// Output returns the log output for this job.
+func (j *Job) Output() string {
+	return ""
+}
+
+// AddLine adds a line of log output to this job.
+func (j *Job) AddLine(output string, timestamp time.Time) error {
+	query := `INSERT INTO log_lines (job_id, output, timestamp) VALUES ($1, $2, $3)`
+	_, err := db.Exec(query, j.ID, output, timestamp)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

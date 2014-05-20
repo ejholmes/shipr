@@ -1,17 +1,17 @@
 package main
 
 import (
-	"database/sql"
-	"log"
-
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
-func main() {
-	db, err := sql.Open("postgres", "dbname=shipr_dev sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+// db holds a global connection to the database.
+var db *sqlx.DB
 
-	log.Println(db)
+func init() {
+	db = sqlx.MustConnect("postgres", "dbname=shipr_dev sslmode=disable")
+}
+
+func main() {
+	defer db.Close()
 }

@@ -1,8 +1,18 @@
+.PHONY: down up
+
 test:
-	${GOPATH}/bin/godep go test ./...
+	godep go test ./...
+
+down:
+	goose -env development down
+	goose -env test down
+
+up:
+	goose -env development up
+	goose -env test up
 
 install:
-	${GOPATH}/bin/godep go install
+	godep go install
 
 run: install
 	./script/run

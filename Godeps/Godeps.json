@@ -16,6 +16,14 @@
 			"Rev": "37d6716c45efb172cd7074a6f29de02945f17353"
 		},
 		{
+			"ImportPath": "github.com/jmoiron/sqlx",
+			"Rev": "ccc1a706b692d25129d5365d9c96e5f20e21009f"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Rev": "c808a1bb644594ca717ac61f71e6b0e454b835e2"
+		},
+		{
 			"ImportPath": "github.com/martini-contrib/binding",
 			"Rev": "3c6304eca9089d5f082b80bf6bbcb8ce1c34c040"
 		}
