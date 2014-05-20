@@ -30,6 +30,7 @@ type LogLine struct {
 // Output returns the log output for this job.
 func (j *Job) Output() (string, error) {
 	var lines []LogLine
+
 	_, err := dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, j.ID)
 	if err != nil {
 		return "", nil

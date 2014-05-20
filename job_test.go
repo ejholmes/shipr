@@ -15,20 +15,52 @@ func testJob(t *testing.T) *Job {
 }
 
 func Test_Job_AddLine(t *testing.T) {
-	job := testJob(t)
-
-	l, err := job.AddLine("Foo\n", time.Now())
-	if err != nil {
-		t.Error(err)
+	type line struct {
+		Output    string
+		Timestamp time.Time
 	}
 
-	output, err := job.Output()
-	if err != nil {
-		t.Error(err)
+	tests := []struct {
+		Lines    []line
+		Expected string
+	}{
+		{
+			[]line{
+				line{"Foo\n", time.Now()},
+			},
+			"Foo\n",
+		},
+		{
+			[]line{
+				line{"First\n", time.Now()},
+				line{"Second\n", time.Now()},
+			},
+			"First\nSecond\n",
+		},
+		{
+			[]line{
+				line{"Second\n", time.Date(2009, time.November, 10, 24, 0, 0, 0, time.UTC)},
+				line{"First\n", time.Date(2009, time.November, 10, 23, 0, 0, 0, time.UTC)},
+			},
+			"First\nSecond\n",
+		},
 	}
 
-	if output != l.Output {
-		t.Errorf("Got %v; want %v", output, l.Output)
+	for _, test := range tests {
+		job := testJob(t)
+
+		for _, l := range test.Lines {
+			job.AddLine(l.Output, l.Timestamp)
+		}
+
+		output, err := job.Output()
+		if err != nil {
+			t.Error(err)
+		}
+
+		if output != test.Expected {
+			t.Errorf("Got %v; want %v", output, test.Expected)
+		}
 	}
 }
 
