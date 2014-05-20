@@ -5,8 +5,18 @@ import (
 	"time"
 )
 
+func testRepo(t *testing.T) *Repo {
+	repo := &Repo{Name: "remind101/test"}
+	err := dbmap.Insert(repo)
+	if err != nil {
+		t.Error(err)
+	}
+	return repo
+}
+
 func testJob(t *testing.T) *Job {
-	job := &Job{Guid: "1234", Sha: "4321", Environment: "production"}
+	repo := testRepo(t)
+	job := &Job{RepoID: repo.ID, Guid: "1234", Sha: "4321", Environment: "production"}
 	err := dbmap.Insert(job)
 	if err != nil {
 		t.Error(err)
@@ -46,7 +56,7 @@ func Test_Job_AddLine(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for i, test := range tests {
 		job := testJob(t)
 
 		for _, l := range test.Lines {
@@ -59,7 +69,7 @@ func Test_Job_AddLine(t *testing.T) {
 		}
 
 		if output != test.Expected {
-			t.Errorf("Got %v; want %v", output, test.Expected)
+			t.Errorf("%d: Got %v; want %v", i, output, test.Expected)
 		}
 	}
 }

@@ -13,6 +13,7 @@ const (
 // Job is our reference to a deployment.
 type Job struct {
 	ID          int
+	RepoID      int `db:"repo_id"`
 	Guid        string
 	Sha         string
 	Environment string

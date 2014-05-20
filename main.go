@@ -24,6 +24,7 @@ func init() {
 
 	dbmap = &gorp.DbMap{Db: conn, Dialect: gorp.PostgresDialect{}}
 
+	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
 }
