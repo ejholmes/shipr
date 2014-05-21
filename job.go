@@ -66,7 +66,8 @@ func (j *Job) IsDone() bool {
 	}
 }
 
-// Returns the status for this job.
+// Returns the status for this job. Returns StatusPending if the exit code
+// is nil.
 func (j *Job) Status() (status JobStatus) {
 	if j.ExitStatus != nil {
 		if *j.ExitStatus == 0 {
