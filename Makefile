@@ -1,4 +1,4 @@
-.PHONY: down up
+.PHONY: down up worker
 
 test:
 	godep go test ./...
@@ -16,3 +16,6 @@ install:
 
 run: install
 	./script/run
+
+worker:
+	cd worker && make install

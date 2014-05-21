@@ -1,0 +1,4 @@
+runtime 'binary'
+file 'deploy.go'
+exec 'deploy'
+build 'go build deploy.go'
