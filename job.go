@@ -14,7 +14,7 @@ const (
 type Job struct {
 	ID          int
 	RepoID      int `db:"repo_id"`
-	Guid        string
+	Guid        int
 	Sha         string
 	Environment string
 	Force       bool
@@ -28,6 +28,23 @@ type LogLine struct {
 	JobID     int `db:"job_id"`
 	Output    string
 	Timestamp time.Time
+}
+
+// CreateJob takes a GitHubDeployment payload and inserts a new Job, then
+// starts the deploy.
+func CreateJob(p *GitHubDeployment) (*Job, error) {
+	job := &Job{
+		Guid:        p.ID,
+		Sha:         p.Sha,
+		Environment: p.Environment,
+	}
+
+	err := dbmap.Insert(job)
+	if err != nil {
+		return nil, err
+	}
+
+	return job, nil
 }
 
 // Output returns the log output for this job.

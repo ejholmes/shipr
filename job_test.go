@@ -16,7 +16,7 @@ func testRepo(t *testing.T) *Repo {
 
 func testJob(t *testing.T) *Job {
 	repo := testRepo(t)
-	job := &Job{RepoID: repo.ID, Guid: "1234", Sha: "4321", Environment: "production"}
+	job := &Job{RepoID: repo.ID, Guid: 1234, Sha: "4321", Environment: "production"}
 	err := dbmap.Insert(job)
 	if err != nil {
 		t.Error(err)
@@ -57,6 +57,8 @@ func Test_Job_AddLine(t *testing.T) {
 	}
 
 	for i, test := range tests {
+		clean()
+
 		job := testJob(t)
 
 		for _, l := range test.Lines {

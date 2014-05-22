@@ -6,7 +6,7 @@ CREATE TABLE repos (
   PRIMARY KEY(id)
 );
 
-CREATE INDEX index_repos_on_name ON repos USING btree (name);
+CREATE UNIQUE INDEX index_repos_on_name ON repos USING btree (name);
 
 CREATE TABLE jobs (
   id SERIAL,
@@ -35,6 +35,6 @@ CREATE INDEX index_log_lines_on_job_id ON log_lines USING btree (job_id);
 CREATE INDEX index_log_lines_on_timestamp ON log_lines USING btree (timestamp);
 
 -- +goose Down
-DROP TABLE repos;
-DROP TABLE jobs;
 DROP TABLE log_lines;
+DROP TABLE jobs;
+DROP TABLE repos;
