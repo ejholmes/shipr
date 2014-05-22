@@ -15,7 +15,7 @@ install:
 	godep go install
 
 run: install
-	./script/run
+	shipr
 
 worker:
 	cd worker && make install

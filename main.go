@@ -31,4 +31,7 @@ func init() {
 
 func main() {
 	defer db.Close()
+
+	server := NewServer()
+	server.Run()
 }
