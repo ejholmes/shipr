@@ -1,12 +1,12 @@
 package main
 
 type GitHubRepository struct {
-	ID   int `json:"id"`
+	ID   int
 	Name string
 }
 
 type GitHubDeployment struct {
-	ID          int `json:"id"`
+	ID          int
 	Sha         string
 	Ref         string
 	Name        string
@@ -17,7 +17,7 @@ type GitHubDeployment struct {
 }
 
 type GitHubDeploymentStatus struct {
-	ID         int `json:"id"`
+	ID         int
 	State      string
 	Deployment GitHubDeployment
 }
