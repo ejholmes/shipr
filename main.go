@@ -8,6 +8,24 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Implementing this interface means that we're deployable.
+type Deployable interface {
+	// A unique identifier for this deployment.
+	Guid() int
+
+	// RepoName should return the string name of the repo to deploy.
+	RepoName() string
+
+	// GitSha should return the git sha that we want to deploy.
+	Sha() string
+
+	// Should return the git ref that is being requested.
+	Ref() string
+
+	// The name of the environment we're deploying to.
+	Environment() string
+}
+
 var (
 	// Sql connection
 	db *sql.DB
@@ -34,4 +52,8 @@ func main() {
 
 	server := NewServer()
 	server.Run()
+}
+
+func Deploy(d Deployable) error {
+	return nil
 }

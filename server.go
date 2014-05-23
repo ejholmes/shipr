@@ -30,28 +30,28 @@ func PostGitHub(w http.ResponseWriter, r *http.Request) (int, string) {
 
 // handlDeployment handles the `deployment` event from GitHub.
 func handleDeployment(w http.ResponseWriter, r *http.Request) (int, string) {
-	var p GitHubDeployment
+	var d GitHubDeployment
 
-	err := parsePayload(r, &p)
+	err := parsePayload(r, &d)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(p)
+	Deploy(&d)
 
 	return 200, "{}"
 }
 
 // handlDeployment handles the `deployment_status` event from GitHub.
 func handleDeploymentStatus(w http.ResponseWriter, r *http.Request) (int, string) {
-	var p GitHubDeploymentStatus
+	var s GitHubDeploymentStatus
 
-	err := parsePayload(r, &p)
+	err := parsePayload(r, &s)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(p)
+	fmt.Println(s)
 
 	return 200, "{}"
 }

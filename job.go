@@ -16,9 +16,9 @@ type Job struct {
 	RepoID      int `db:"repo_id"`
 	Guid        int
 	Sha         string
-	Environment string
 	Force       bool
 	Description string
+	Environment string
 	ExitStatus  *int `db:"exit_status"`
 }
 
@@ -32,11 +32,11 @@ type LogLine struct {
 
 // CreateJob takes a GitHubDeployment payload and inserts a new Job, then
 // starts the deploy.
-func CreateJob(p *GitHubDeployment) (*Job, error) {
+func CreateJob(d Deployable) (*Job, error) {
 	job := &Job{
-		Guid:        p.ID,
-		Sha:         p.Sha,
-		Environment: p.Environment,
+		Guid:        d.Guid(),
+		Sha:         d.Sha(),
+		Environment: d.Environment(),
 	}
 
 	err := dbmap.Insert(job)
