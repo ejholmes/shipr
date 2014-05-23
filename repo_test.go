@@ -5,7 +5,7 @@ import "testing"
 func Test_FindRepo(t *testing.T) {
 	clean()
 
-	_, err := CreateRepo("remind101/r101-api", false)
+	_, err := CreateRepo("remind101/r101-api")
 	if err != nil {
 		t.Error(err)
 	}

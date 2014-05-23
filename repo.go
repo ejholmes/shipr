@@ -6,17 +6,30 @@ type Repo struct {
 	Name string
 }
 
+// FindOrCreateRepo tries to find the repo by name or it creates it.
+func FindOrCreateRepo(name string) (*Repo, error) {
+	repo, err := FindRepo(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if repo == nil {
+		repo, err = CreateRepo(name)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return repo, nil
+}
+
 // CreateRepo creates a new Repo by name.
-func CreateRepo(name string, hook bool) (*Repo, error) {
+func CreateRepo(name string) (*Repo, error) {
 	repo := &Repo{Name: name}
 
 	err := dbmap.Insert(repo)
 	if err != nil {
 		return nil, err
-	}
-
-	if hook {
-		repo.InstallGitHubHook()
 	}
 
 	return repo, nil

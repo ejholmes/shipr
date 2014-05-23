@@ -30,16 +30,22 @@ type LogLine struct {
 	Timestamp time.Time
 }
 
-// CreateJob takes a GitHubDeployment payload and inserts a new Job, then
-// starts the deploy.
+// CreateJob takes a Deployable and inserts a new Job.
 func CreateJob(d Deployable) (*Job, error) {
+	repo, err := FindOrCreateRepo(d.RepoName())
+	if err != nil {
+		return nil, err
+	}
+
 	job := &Job{
+		RepoID:      repo.ID,
 		Guid:        d.Guid(),
 		Sha:         d.Sha(),
 		Environment: d.Environment(),
+		Description: d.Description(),
 	}
 
-	err := dbmap.Insert(job)
+	err = dbmap.Insert(job)
 	if err != nil {
 		return nil, err
 	}

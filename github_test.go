@@ -47,4 +47,8 @@ func Test_GitHubDeployment_Deployable(t *testing.T) {
 	if d.Environment() != "production" {
 		t.Error(notDeployable)
 	}
+
+	if d.Description() != "" {
+		t.Error(notDeployable)
+	}
 }

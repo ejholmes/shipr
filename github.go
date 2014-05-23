@@ -14,9 +14,9 @@ type GitHubDeployment struct {
 	RawSha         string `json:"sha"`
 	RawRef         string `json:"ref"`
 	RawEnvironment string `json:"environment"`
+	RawDescription string `json:"description"`
 	Name           string
 	Payload        map[string]interface{}
-	Description    string
 	Repository     GitHubRepository
 }
 
@@ -53,4 +53,9 @@ func (d *GitHubDeployment) Ref() string {
 // Environment returns the deploy environment that was requested.
 func (d *GitHubDeployment) Environment() string {
 	return d.RawEnvironment
+}
+
+// Description returns the description for the deploy.
+func (d *GitHubDeployment) Description() string {
+	return d.RawDescription
 }

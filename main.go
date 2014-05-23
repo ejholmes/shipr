@@ -24,6 +24,9 @@ type Deployable interface {
 
 	// Environment should return the name of the environment that the repo is being deploy to.
 	Environment() string
+
+	// Description should return a string description for the deploy.
+	Description() string
 }
 
 var (
@@ -52,5 +55,9 @@ func main() {
 }
 
 func Deploy(d Deployable) error {
+	_, err := CreateJob(d)
+	if err != nil {
+		return err
+	}
 	return nil
 }
