@@ -7,9 +7,7 @@
     "sha": "13c6b1509c1c0f6a38cf9994cb510df5d39bb693",
     "ref": "develop",
     "payload": {
-      "environment": "staging",
       "user": "quentin",
-      "force": false
     },
     "environment": "production",
     "description": null,

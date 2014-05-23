@@ -10,7 +10,7 @@ import (
 
 // Implementing this interface means that we're deployable.
 type Deployable interface {
-	// A unique identifier for this deployment.
+	// Guid should return a unique identifier for this deployment.
 	Guid() int
 
 	// RepoName should return the string name of the repo to deploy.
@@ -19,18 +19,16 @@ type Deployable interface {
 	// GitSha should return the git sha that we want to deploy.
 	Sha() string
 
-	// Should return the git ref that is being requested.
+	// Ref should return the git ref that is being requested.
 	Ref() string
 
-	// The name of the environment we're deploying to.
+	// Environment should return the name of the environment that the repo is being deploy to.
 	Environment() string
 }
 
 var (
-	// Sql connection
-	db *sql.DB
-
-	// db holds a global connection to the database.
+	// Database
+	db    *sql.DB
 	dbmap *gorp.DbMap
 )
 
@@ -41,7 +39,6 @@ func init() {
 	}
 
 	dbmap = &gorp.DbMap{Db: conn, Dialect: gorp.PostgresDialect{}}
-
 	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")

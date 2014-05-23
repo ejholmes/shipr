@@ -5,9 +5,7 @@
   "name": "remind101/r101-api",
   "environment": "production",
   "payload": {
-    "environment": "staging",
-    "user": "quentin",
-    "force": false
+    "user": "quentin"
   },
   "description": null,
   "repository": {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"testing"
 )
@@ -23,12 +24,27 @@ func testGitHubDeployment(t *testing.T) *GitHubDeployment {
 	return &d
 }
 
-func Test_GitHubDeployment_RepoName(t *testing.T) {
+func Test_GitHubDeployment_Deployable(t *testing.T) {
 	d := testGitHubDeployment(t)
+	notDeployable := errors.New("Expected GitHubDeployment to be Deployable but it's not.")
 
-	got := d.RepoName()
-	want := "remind101/r101-api"
-	if got != want {
-		t.Error("RepoName() got %v; want %v", got, want)
+	if d.Guid() != 11939 {
+		t.Error(notDeployable)
+	}
+
+	if d.RepoName() != "remind101/r101-api" {
+		t.Error(notDeployable)
+	}
+
+	if d.Sha() != "13c6b1509c1c0f6a38cf9994cb510df5d39bb693" {
+		t.Error(notDeployable)
+	}
+
+	if d.Ref() != "develop" {
+		t.Error(notDeployable)
+	}
+
+	if d.Environment() != "production" {
+		t.Error(notDeployable)
 	}
 }
