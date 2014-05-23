@@ -101,3 +101,8 @@ func (j *Job) Status() (status JobStatus) {
 	}
 	return
 }
+
+// Run (Deploy) the job.
+func (j *Job) Run() error {
+	return herokuDeployer.Deploy(j)
+}

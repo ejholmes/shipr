@@ -33,9 +33,13 @@ var (
 	// Database
 	db    *sql.DB
 	dbmap *gorp.DbMap
+
+	// Deployers
+	herokuDeployer *HerokuDeployer
 )
 
 func init() {
+	// Setup database.
 	conn, err := sql.Open("postgres", "dbname=shipr_dev sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
@@ -45,6 +49,9 @@ func init() {
 	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
+
+	// Setup deployers.
+	herokuDeployer = &HerokuDeployer{}
 }
 
 func main() {
@@ -54,10 +61,11 @@ func main() {
 	server.Run()
 }
 
+// Deploy takes a Deployable, creates a Job for it and runs the deployment.
 func Deploy(d Deployable) error {
-	_, err := CreateJob(d)
+	j, err := CreateJob(d)
 	if err != nil {
 		return err
 	}
-	return nil
+	return j.Run()
 }
