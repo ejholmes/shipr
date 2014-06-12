@@ -22,8 +22,12 @@ module Shipr
         super(params).select { |_, val| !val.nil? }
       end
 
+      def required_contexts
+        params.force ? [] : nil
+      end
+
       def deploy
-        Shipr::GitHub::Deployment.create(params.name, declared(params).except(:name))
+        Shipr::GitHub::Deployment.create(params.name, declared(params.merge(required_contexts: required_contexts)).except(:name))
       end
     end
 
