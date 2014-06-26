@@ -1,20 +1,27 @@
 package main
 
+import "github.com/coopernurse/gorp"
+
+// A Repository has methods for adding and removing repos.
+type RepoRepository struct {
+	dbmap *gorp.DbMap
+}
+
 // A Repo represents a GitHub repo.
 type Repo struct {
 	ID   int
 	Name string
 }
 
-// FindOrCreateRepo tries to find the repo by name or it creates it.
-func FindOrCreateRepo(name string) (*Repo, error) {
-	repo, err := FindRepo(name)
+// FindOrCreate tries to find the repo by name or it creates it.
+func (r *RepoRepository) FindOrCreate(name string) (*Repo, error) {
+	repo, err := r.FindByName(name)
 	if err != nil {
 		return nil, err
 	}
 
 	if repo == nil {
-		repo, err = CreateRepo(name)
+		repo, err = r.Create(name)
 		if err != nil {
 			return nil, err
 		}
@@ -23,11 +30,11 @@ func FindOrCreateRepo(name string) (*Repo, error) {
 	return repo, nil
 }
 
-// CreateRepo creates a new Repo by name.
-func CreateRepo(name string) (*Repo, error) {
+// Create creates a new Repo by name.
+func (r *RepoRepository) Create(name string) (*Repo, error) {
 	repo := &Repo{Name: name}
 
-	err := dbmap.Insert(repo)
+	err := r.dbmap.Insert(repo)
 	if err != nil {
 		return nil, err
 	}
@@ -35,21 +42,21 @@ func CreateRepo(name string) (*Repo, error) {
 	return repo, nil
 }
 
-// FindRepo trys to find a repo by name. If the repo is not found,
+// FindByName trys to find a repo by name. If the repo is not found,
 // returns nil.
-func FindRepo(name string) (*Repo, error) {
-	var r Repo
+func (r *RepoRepository) FindByName(name string) (*Repo, error) {
+	var repo Repo
 
-	err := dbmap.SelectOne(&r, `SELECT * FROM repos WHERE name = $1 LIMIT 1`, name)
+	err := r.dbmap.SelectOne(&repo, `SELECT * FROM repos WHERE name = $1 LIMIT 1`, name)
 	if err != nil {
 		return nil, err
 	}
 
-	if r.ID == 0 {
+	if repo.ID == 0 {
 		return nil, nil
 	}
 
-	return &r, err
+	return &repo, err
 }
 
 // InstallGitHubHook sets the GitHub deployment and deployment_status

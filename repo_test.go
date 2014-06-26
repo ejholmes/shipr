@@ -5,12 +5,12 @@ import "testing"
 func Test_FindRepo(t *testing.T) {
 	defer cleanup(t)
 
-	_, err := CreateRepo("remind101/r101-api")
+	_, err := repos.Create("remind101/r101-api")
 	if err != nil {
 		t.Error(err)
 	}
 
-	found, err := FindRepo("remind101/r101-api")
+	found, err := repos.FindByName("remind101/r101-api")
 	if err != nil {
 		t.Error(err)
 	}
@@ -23,7 +23,7 @@ func Test_FindRepo(t *testing.T) {
 func Test_FindRepo_NotFound(t *testing.T) {
 	defer cleanup(t)
 
-	repo, _ := FindRepo("remind101/foo")
+	repo, _ := repos.FindByName("remind101/foo")
 	if repo != nil {
 		t.Error("Expected an error.")
 	}

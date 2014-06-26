@@ -32,7 +32,7 @@ type LogLine struct {
 
 // CreateJob takes a Deployable and inserts a new Job.
 func CreateJob(d Deployable) (*Job, error) {
-	repo, err := FindOrCreateRepo(d.RepoName())
+	repo, err := repos.FindOrCreate(d.RepoName())
 	if err != nil {
 		return nil, err
 	}

@@ -39,6 +39,9 @@ var (
 	db    *sql.DB
 	dbmap *gorp.DbMap
 
+	// Repositories
+	repos *RepoRepository
+
 	// Deployers
 	herokuDeployer *HerokuDeployer
 )
@@ -71,6 +74,8 @@ func initDb() {
 	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
+
+	repos = &RepoRepository{dbmap}
 }
 
 func main() {
