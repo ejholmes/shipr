@@ -1,6 +1,10 @@
 package main
 
-import "time"
+import (
+	"time"
+
+	"github.com/coopernurse/gorp"
+)
 
 type JobStatus int
 
@@ -9,6 +13,11 @@ const (
 	StatusFailed
 	StatusSucceeded
 )
+
+// JobRepository has methods for adding and removing jobs.
+type JobRepository struct {
+	dbmap *gorp.DbMap
+}
 
 // Job is our reference to a deployment.
 type Job struct {
@@ -31,7 +40,7 @@ type LogLine struct {
 }
 
 // CreateJob takes a Deployable and inserts a new Job.
-func CreateJob(d Deployable) (*Job, error) {
+func (j *JobRepository) Create(d Deployable) (*Job, error) {
 	repo, err := repos.FindOrCreate(d.RepoName())
 	if err != nil {
 		return nil, err

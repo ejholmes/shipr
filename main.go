@@ -41,6 +41,7 @@ var (
 
 	// Repositories
 	repos *RepoRepository
+	jobs  *JobRepository
 
 	// Deployers
 	herokuDeployer *HerokuDeployer
@@ -76,6 +77,7 @@ func initDb() {
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
 
 	repos = &RepoRepository{dbmap}
+	jobs = &JobRepository{dbmap}
 }
 
 func main() {
@@ -87,7 +89,7 @@ func main() {
 
 // Deploy takes a Deployable, creates a Job for it and runs the deployment.
 func Deploy(d Deployable) error {
-	j, err := CreateJob(d)
+	j, err := jobs.Create(d)
 	if err != nil {
 		return err
 	}
