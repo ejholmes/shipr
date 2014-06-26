@@ -1,7 +1,10 @@
 .PHONY: down up worker
 
 test:
-	godep go test -v ./...
+	godep go test ./...
+
+integration:
+	godep go test -tags=integration ./...
 
 down:
 	goose -env development down

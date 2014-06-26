@@ -68,9 +68,30 @@ func (r *JobRepository) CreateByDeployable(d Deployable) (*Job, error) {
 	return job, nil
 }
 
-// Insert inserts the job into the database.
+// Find finds a Job by id.
+func (r *JobRepository) First() (*Job, error) {
+	var job Job
+
+	err := r.dbmap.SelectOne(&job, `SELECT * FROM jobs LIMIT 1`)
+	if err != nil {
+		return nil, err
+	}
+
+	return &job, nil
+}
+
+// Insert inserts the Job into the database.
 func (r *JobRepository) Insert(job *Job) error {
 	return r.dbmap.Insert(job)
+}
+
+// Total returns the total number of Jobs.
+func (r *JobRepository) Total() (int64, error) {
+	count, err := r.dbmap.SelectInt(`SELECT count(*) from jobs`)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 // Output returns the log output for this job.

@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const EventHeader = "X-GitHub-Event"
+const GitHubEventHeader = "X-GitHub-Event"
 
 var GitHubEventHandlers = map[string]http.HandlerFunc{
 	"deployment":        HandleDeployment,
@@ -19,7 +19,7 @@ func NewServer() http.Handler {
 	m := mux.NewRouter()
 
 	for event, handler := range GitHubEventHandlers {
-		m.HandleFunc("/github", handler).Methods("POST").Headers(EventHeader, event)
+		m.HandleFunc("/github", handler).Methods("POST").Headers(GitHubEventHeader, event)
 	}
 
 	return m
@@ -28,7 +28,11 @@ func NewServer() http.Handler {
 func HandleDeployment(w http.ResponseWriter, r *http.Request) {
 	var d GitHubDeployment
 	decodeRequest(r, &d)
-	Deploy(&d)
+
+	err := Deploy(&d)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func HandleDeploymentStatus(w http.ResponseWriter, r *http.Request) {

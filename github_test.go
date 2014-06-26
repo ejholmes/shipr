@@ -3,17 +3,8 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
 	"testing"
 )
-
-func fixture(t *testing.T, path string) []byte {
-	raw, err := ioutil.ReadFile("fixtures/" + path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return raw
-}
 
 func testGitHubDeployment(t *testing.T) *GitHubDeployment {
 	var d GitHubDeployment
