@@ -74,11 +74,9 @@ func (r *JobRepository) Insert(job *Job) error {
 
 // Output returns the log output for this job.
 func (j *Job) Output() (string, error) {
-	var lines []LogLine
-
-	_, err := dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, j.ID)
+	lines, err := j.LogLines()
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	output := ""
@@ -89,10 +87,14 @@ func (j *Job) Output() (string, error) {
 	return output, nil
 }
 
+func (j *Job) LogLines() ([]LogLine, error) {
+	return logLines.AllForJob(j)
+}
+
 // AddLine adds a line of log output to this job.
 func (j *Job) AddLine(output string, timestamp time.Time) (*LogLine, error) {
 	l := &LogLine{JobID: j.ID, Output: output, Timestamp: timestamp}
-	err := dbmap.Insert(l)
+	err := logLines.Insert(l)
 	if err != nil {
 		return nil, err
 	}
@@ -124,4 +126,21 @@ func (j *Job) Status() (status JobStatus) {
 // Run (Deploy) the job.
 func (j *Job) Run() error {
 	return herokuDeployer.Deploy(j)
+}
+
+// Insert inserts a LogLine
+func (r *LogLineRepository) Insert(logLine *LogLine) error {
+	return r.dbmap.Insert(logLine)
+}
+
+// AllForJob returns a slice of LogLine for the Job.
+func (r *LogLineRepository) AllForJob(j *Job) ([]LogLine, error) {
+	var lines []LogLine
+
+	_, err := dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, j.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return lines, nil
 }
