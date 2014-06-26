@@ -40,9 +40,8 @@ var (
 	dbmap *gorp.DbMap
 
 	// Repositories
-	repos    *RepoRepository
-	jobs     *JobRepository
-	logLines *LogLineRepository
+	repos *RepoRepository
+	jobs  *JobRepository
 
 	// Deployers
 	herokuDeployer *HerokuDeployer
@@ -79,7 +78,6 @@ func initDb() {
 
 	repos = &RepoRepository{dbmap}
 	jobs = &JobRepository{dbmap}
-	logLines = &LogLineRepository{dbmap}
 }
 
 func main() {

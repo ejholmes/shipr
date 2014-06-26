@@ -33,6 +33,7 @@ type Job struct {
 
 // LogLineRepository has methods for adding and removing log lines.
 type LogLineRepository struct {
+	job   *Job
 	dbmap *gorp.DbMap
 }
 
@@ -74,7 +75,7 @@ func (r *JobRepository) Insert(job *Job) error {
 
 // Output returns the log output for this job.
 func (j *Job) Output() (string, error) {
-	lines, err := j.LogLines()
+	lines, err := j.LogLines().All()
 	if err != nil {
 		return "", err
 	}
@@ -87,18 +88,13 @@ func (j *Job) Output() (string, error) {
 	return output, nil
 }
 
-func (j *Job) LogLines() ([]LogLine, error) {
-	return logLines.AllForJob(j)
+func (j *Job) LogLines() *LogLineRepository {
+	return &LogLineRepository{j, dbmap}
 }
 
 // AddLine adds a line of log output to this job.
 func (j *Job) AddLine(output string, timestamp time.Time) (*LogLine, error) {
-	l := &LogLine{JobID: j.ID, Output: output, Timestamp: timestamp}
-	err := logLines.Insert(l)
-	if err != nil {
-		return nil, err
-	}
-	return l, nil
+	return j.LogLines().Add(output, timestamp)
 }
 
 // Returns if the job is done or not.
@@ -128,16 +124,26 @@ func (j *Job) Run() error {
 	return herokuDeployer.Deploy(j)
 }
 
-// Insert inserts a LogLine
+// Add adds a LogLine.
+func (r *LogLineRepository) Add(output string, timestamp time.Time) (*LogLine, error) {
+	l := &LogLine{JobID: r.job.ID, Output: output, Timestamp: timestamp}
+	err := r.Insert(l)
+	if err != nil {
+		return nil, err
+	}
+	return l, nil
+}
+
+// Insert inserts a LogLine.
 func (r *LogLineRepository) Insert(logLine *LogLine) error {
 	return r.dbmap.Insert(logLine)
 }
 
 // AllForJob returns a slice of LogLine for the Job.
-func (r *LogLineRepository) AllForJob(j *Job) ([]LogLine, error) {
+func (r *LogLineRepository) All() ([]LogLine, error) {
 	var lines []LogLine
 
-	_, err := dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, j.ID)
+	_, err := dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, r.job.ID)
 	if err != nil {
 		return nil, err
 	}
