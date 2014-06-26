@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"net/http"
 
 	"bitbucket.org/liamstask/goose/lib/goose"
 
@@ -76,7 +77,7 @@ func main() {
 	defer db.Close()
 
 	server := NewServer()
-	server.Run()
+	http.ListenAndServe(":3001", server)
 }
 
 // Deploy takes a Deployable, creates a Job for it and runs the deployment.

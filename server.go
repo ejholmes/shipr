@@ -2,70 +2,43 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
+
 	"net/http"
 
-	"github.com/codegangsta/martini"
+	"github.com/gorilla/mux"
 )
 
-func NewServer() *martini.ClassicMartini {
-	m := martini.Classic()
-	m.Post("/github", PostGitHub)
+const EventHeader = "X-GitHub-Event"
+
+var GitHubEventHandlers = map[string]http.HandlerFunc{
+	"deployment":        HandleDeployment,
+	"deployment_status": HandleDeploymentStatus,
+}
+
+func NewServer() http.Handler {
+	m := mux.NewRouter()
+
+	for event, handler := range GitHubEventHandlers {
+		m.HandleFunc("/github", handler).Methods("POST").Headers(EventHeader, event)
+	}
+
 	return m
 }
 
-func PostGitHub(w http.ResponseWriter, r *http.Request) (int, string) {
-	event := r.Header.Get("X-GitHub-Event")
-
-	switch event {
-	case "deployment":
-		return handleDeployment(w, r)
-	case "deployment_status":
-		return handleDeploymentStatus(w, r)
-	default:
-		return 400, "Bad Request"
-	}
-}
-
-// handlDeployment handles the `deployment` event from GitHub.
-func handleDeployment(w http.ResponseWriter, r *http.Request) (int, string) {
+func HandleDeployment(w http.ResponseWriter, r *http.Request) {
 	var d GitHubDeployment
-
-	err := parsePayload(r, &d)
-	if err != nil {
-		panic(err)
-	}
-
+	decodeRequest(r, &d)
 	Deploy(&d)
-
-	return 200, "{}"
 }
 
-// handlDeployment handles the `deployment_status` event from GitHub.
-func handleDeploymentStatus(w http.ResponseWriter, r *http.Request) (int, string) {
+func HandleDeploymentStatus(w http.ResponseWriter, r *http.Request) {
 	var s GitHubDeploymentStatus
+	decodeRequest(r, &s)
+}
 
-	err := parsePayload(r, &s)
+func decodeRequest(r *http.Request, v interface{}) {
+	err := json.NewDecoder(r.Body).Decode(v)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(s)
-
-	return 200, "{}"
-}
-
-func parsePayload(r *http.Request, v interface{}) error {
-	raw, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(raw, v)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

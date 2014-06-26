@@ -7,17 +7,17 @@
 			"Rev": "e885648f5ad6e48f7d7532b9c0b21767333d50ab"
 		},
 		{
-			"ImportPath": "github.com/codegangsta/inject",
-			"Rev": "37512bbe41b4cc579cdd706742efc7bf34f94b06"
-		},
-		{
-			"ImportPath": "github.com/codegangsta/martini",
-			"Rev": "d287ef8c57cde8699be90e08acfc91733912d419"
-		},
-		{
 			"ImportPath": "github.com/coopernurse/gorp",
 			"Comment": "v1.2.1",
 			"Rev": "32a45d9c74f42c1db41db5d4261760a613832a3d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1f3e8a46c5bb4c29971d9867ede6e198ca5eddce"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "136d54f81f00414c45c3c68dd47e98cc97519c5e"
 		},
 		{
 			"ImportPath": "github.com/kylelemons/go-gypsy/yaml",
