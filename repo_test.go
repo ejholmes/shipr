@@ -5,7 +5,7 @@ import "testing"
 func Test_FindRepo(t *testing.T) {
 	defer cleanup(t)
 
-	_, err := repos.Create("remind101/r101-api")
+	_, err := repos.CreateByName("remind101/r101-api")
 	if err != nil {
 		t.Error(err)
 	}

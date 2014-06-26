@@ -89,7 +89,7 @@ func main() {
 
 // Deploy takes a Deployable, creates a Job for it and runs the deployment.
 func Deploy(d Deployable) error {
-	j, err := jobs.Create(d)
+	j, err := jobs.CreateByDeployable(d)
 	if err != nil {
 		return err
 	}

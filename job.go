@@ -31,6 +31,11 @@ type Job struct {
 	ExitStatus  *int `db:"exit_status"`
 }
 
+// LogLineRepository has methods for adding and removing log lines.
+type LogLineRepository struct {
+	dbmap *gorp.DbMap
+}
+
 // LogLine represents a line of log output from the deploy job.
 type LogLine struct {
 	ID        int
@@ -39,9 +44,9 @@ type LogLine struct {
 	Timestamp time.Time
 }
 
-// CreateJob takes a Deployable and inserts a new Job.
-func (j *JobRepository) Create(d Deployable) (*Job, error) {
-	repo, err := repos.FindOrCreate(d.RepoName())
+// CreateByDeployable takes a Deployable and inserts a new Job.
+func (r *JobRepository) CreateByDeployable(d Deployable) (*Job, error) {
+	repo, err := repos.FindOrCreateByName(d.RepoName())
 	if err != nil {
 		return nil, err
 	}
@@ -54,12 +59,17 @@ func (j *JobRepository) Create(d Deployable) (*Job, error) {
 		Description: d.Description(),
 	}
 
-	err = dbmap.Insert(job)
+	err = r.Insert(job)
 	if err != nil {
 		return nil, err
 	}
 
 	return job, nil
+}
+
+// Insert inserts the job into the database.
+func (r *JobRepository) Insert(job *Job) error {
+	return r.dbmap.Insert(job)
 }
 
 // Output returns the log output for this job.

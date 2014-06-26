@@ -13,15 +13,15 @@ type Repo struct {
 	Name string
 }
 
-// FindOrCreate tries to find the repo by name or it creates it.
-func (r *RepoRepository) FindOrCreate(name string) (*Repo, error) {
+// FindOrCreateByName tries to find the repo by name or it creates it.
+func (r *RepoRepository) FindOrCreateByName(name string) (*Repo, error) {
 	repo, err := r.FindByName(name)
 	if err != nil {
 		return nil, err
 	}
 
 	if repo == nil {
-		repo, err = r.Create(name)
+		repo, err = r.CreateByName(name)
 		if err != nil {
 			return nil, err
 		}
@@ -30,16 +30,21 @@ func (r *RepoRepository) FindOrCreate(name string) (*Repo, error) {
 	return repo, nil
 }
 
-// Create creates a new Repo by name.
-func (r *RepoRepository) Create(name string) (*Repo, error) {
+// CreateByName creates a new Repo by name.
+func (r *RepoRepository) CreateByName(name string) (*Repo, error) {
 	repo := &Repo{Name: name}
 
-	err := r.dbmap.Insert(repo)
+	err := r.Insert(repo)
 	if err != nil {
 		return nil, err
 	}
 
 	return repo, nil
+}
+
+// Insert inserts the repo into postgres.
+func (r *RepoRepository) Insert(repo *Repo) error {
+	return r.dbmap.Insert(repo)
 }
 
 // FindByName trys to find a repo by name. If the repo is not found,
