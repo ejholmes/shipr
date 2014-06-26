@@ -7,7 +7,7 @@ import (
 
 func testRepo(t *testing.T) *Repo {
 	repo := &Repo{Name: "remind101/test"}
-	err := dbmap.Insert(repo)
+	err := repos.Insert(repo)
 	if err != nil {
 		t.Error(err)
 	}
@@ -17,7 +17,7 @@ func testRepo(t *testing.T) *Repo {
 func testJob(t *testing.T) *Job {
 	repo := testRepo(t)
 	job := &Job{RepoID: repo.ID, Guid: 1234, Sha: "4321", Environment: "production"}
-	err := dbmap.Insert(job)
+	err := jobs.Insert(job)
 	if err != nil {
 		t.Error(err)
 	}
