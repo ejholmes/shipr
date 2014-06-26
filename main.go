@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"log"
 
+	"bitbucket.org/liamstask/goose/lib/goose"
+
 	"github.com/coopernurse/gorp"
 	_ "github.com/lib/pq"
 )
@@ -30,6 +32,8 @@ type Deployable interface {
 }
 
 var (
+	Env string
+
 	// Database
 	db    *sql.DB
 	dbmap *gorp.DbMap
@@ -39,19 +43,33 @@ var (
 )
 
 func init() {
-	// Setup database.
-	conn, err := sql.Open("postgres", "dbname=shipr_dev sslmode=disable")
-	if err != nil {
-		log.Fatalln(err)
+	if Env == "" {
+		Env = "development"
 	}
 
-	dbmap = &gorp.DbMap{Db: conn, Dialect: gorp.PostgresDialect{}}
-	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
-	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
-	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
+	initDb()
 
 	// Setup deployers.
 	herokuDeployer = &HerokuDeployer{}
+}
+
+func initDb() {
+	var err error
+
+	dbconf, err := goose.NewDBConf("db", Env)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	db, err = sql.Open(dbconf.Driver.Name, dbconf.Driver.OpenStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	dbmap = &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
+	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
+	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
+	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
 }
 
 func main() {
