@@ -57,7 +57,7 @@ func Test_Job_AddLine(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		clean()
+		cleanup(t)
 
 		job := testJob(t)
 

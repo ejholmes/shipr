@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func Test_FindRepo(t *testing.T) {
-	clean()
+	defer cleanup(t)
 
 	_, err := CreateRepo("remind101/r101-api")
 	if err != nil {
@@ -21,7 +21,7 @@ func Test_FindRepo(t *testing.T) {
 }
 
 func Test_FindRepo_NotFound(t *testing.T) {
-	clean()
+	defer cleanup(t)
 
 	repo, _ := FindRepo("remind101/foo")
 	if repo != nil {
