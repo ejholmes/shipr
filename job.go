@@ -68,7 +68,7 @@ func (r *JobRepository) CreateByDeployable(d Deployable) (*Job, error) {
 	return job, nil
 }
 
-// Find finds a Job by id.
+// First finds the first job.
 func (r *JobRepository) First() (*Job, error) {
 	var job Job
 
@@ -109,6 +109,7 @@ func (j *Job) Output() (string, error) {
 	return output, nil
 }
 
+// LogLines returns a LogLineRepository scoped to this job.
 func (j *Job) LogLines() *LogLineRepository {
 	return &LogLineRepository{j, dbmap}
 }
