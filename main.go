@@ -55,7 +55,7 @@ func init() {
 	initDb()
 
 	// Setup deployers.
-	herokuDeployer = &HerokuDeployer{}
+	herokuDeployer = NewHerokuDeployer("", "")
 }
 
 func initDb() {

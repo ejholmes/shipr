@@ -8,7 +8,7 @@ import (
 
 func testGitHubDeployment(t *testing.T) *GitHubDeployment {
 	var d GitHubDeployment
-	err := json.Unmarshal(fixture(t, "deployment.json"), &d)
+	err := json.Unmarshal(fixture(t, "github/deployment.json"), &d)
 	if err != nil {
 		t.Error(err)
 	}

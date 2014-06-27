@@ -14,7 +14,7 @@ func Test_GitHubDeploy(t *testing.T) {
 	defer cleanup(t)
 
 	server := NewServer()
-	req, _ := http.NewRequest("POST", "/github", bytes.NewReader(fixture(t, "deployment.json")))
+	req, _ := http.NewRequest("POST", "/github", bytes.NewReader(fixture(t, "github/deployment.json")))
 	req.Header.Set(GitHubEventHeader, "deployment")
 
 	resp := httptest.NewRecorder()
