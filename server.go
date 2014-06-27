@@ -5,6 +5,7 @@ import (
 
 	"net/http"
 
+	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 )
 
@@ -22,7 +23,11 @@ func NewServer() http.Handler {
 		m.HandleFunc("/github", handler).Methods("POST").Headers(GitHubEventHeader, event)
 	}
 
-	return m
+	n := negroni.New()
+	n.Use(negroni.NewRecovery())
+	n.UseHandler(m)
+
+	return n
 }
 
 func HandleDeployment(w http.ResponseWriter, r *http.Request) {
