@@ -1,0 +1,15 @@
+{
+  "created_at": "2012-01-01T12:00:00Z",
+  "id": "01234567-89ab-cdef-0123-456789abcdef",
+  "source_blob": {
+    "url": "https://example.com/source.tgz?token=xyz",
+    "version": "v1.3.0"
+  },
+  "slug": "01234567-89ab-cdef-0123-456789abcdef",
+  "status": "succeeded",
+  "updated_at": "2012-01-01T12:00:00Z",
+  "user": {
+    "id": "01234567-89ab-cdef-0123-456789abcdef",
+    "email": "username@example.com"
+  }
+}
