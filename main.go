@@ -11,7 +11,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Implementing this interface means that we're deployable.
+// Deployable is an interface that's used for creating Job's. We implement this
+// interface on the GitHubDeployment struct, so that we can deploy github's
+// deployment events directly.
 type Deployable interface {
 	// Guid should return a unique identifier for this deployment.
 	Guid() int
@@ -19,7 +21,7 @@ type Deployable interface {
 	// RepoName should return the string name of the repo to deploy.
 	RepoName() string
 
-	// GitSha should return the git sha that we want to deploy.
+	// Sha should return the git sha that we want to deploy.
 	Sha() string
 
 	// Ref should return the git ref that is being requested.
