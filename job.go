@@ -143,7 +143,7 @@ func (j *Job) Status() (status JobStatus) {
 
 // Run (Deploy) the job.
 func (j *Job) Run() error {
-	return herokuDeployer.Deploy(j)
+	return deployer.Deploy(j)
 }
 
 // Add adds a LogLine.

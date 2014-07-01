@@ -32,6 +32,11 @@ type Deployable interface {
 	Description() string
 }
 
+// Deployers are capable of deploying jobs.
+type Deployer interface {
+	Deploy(*Job) error
+}
+
 var (
 	Env string
 
@@ -44,7 +49,7 @@ var (
 	jobs  *JobRepository
 
 	// Deployers
-	herokuDeployer *HerokuDeployer
+	deployer Deployer
 )
 
 func init() {
@@ -55,7 +60,7 @@ func init() {
 	initDb()
 
 	// Setup deployers.
-	herokuDeployer = NewHerokuDeployer("", "")
+	deployer = NewHerokuDeployer("", "")
 }
 
 func initDb() {
