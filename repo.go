@@ -1,4 +1,4 @@
-package main
+package shipr
 
 import "github.com/coopernurse/gorp"
 

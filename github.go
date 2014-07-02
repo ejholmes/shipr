@@ -1,4 +1,4 @@
-package main
+package shipr
 
 // GitHubRepository is embedded inside GitHubDeployment and GitHubDeploymentStatus.
 type GitHubRepository struct {

@@ -1,4 +1,4 @@
-package main
+package shipr
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 
 func testRepo(t *testing.T) *Repo {
 	repo := &Repo{Name: "remind101/test"}
-	err := repos.Insert(repo)
+	err := Repos.Insert(repo)
 	if err != nil {
 		t.Error(err)
 	}
@@ -17,7 +17,7 @@ func testRepo(t *testing.T) *Repo {
 func testJob(t *testing.T) *Job {
 	repo := testRepo(t)
 	job := &Job{RepoID: repo.ID, Guid: 1234, Sha: "4321", Environment: "production"}
-	err := jobs.Insert(job)
+	err := Jobs.Insert(job)
 	if err != nil {
 		t.Error(err)
 	}

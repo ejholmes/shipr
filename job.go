@@ -1,4 +1,4 @@
-package main
+package shipr
 
 import (
 	"time"
@@ -47,7 +47,7 @@ type LogLine struct {
 
 // CreateByDeployable takes a Deployable and inserts a new Job.
 func (r *JobRepository) CreateByDeployable(d Deployable) (*Job, error) {
-	repo, err := repos.FindOrCreateByName(d.RepoName())
+	repo, err := Repos.FindOrCreateByName(d.RepoName())
 	if err != nil {
 		return nil, err
 	}
