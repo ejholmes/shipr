@@ -64,6 +64,22 @@ func (r *RepoRepository) FindByName(name string) (*Repo, error) {
 	return &repo, err
 }
 
+// Find finds a repo by id.
+func (r *RepoRepository) Find(id int) (*Repo, error) {
+	var repo Repo
+
+	err := r.dbmap.SelectOne(&repo, `SELECT * FROM repos WHERE id = $1 LIMIT 1`, id)
+	if err != nil {
+		return nil, err
+	}
+
+	if repo.ID == 0 {
+		return nil, nil
+	}
+
+	return &repo, err
+}
+
 // InstallGitHubHook sets the GitHub deployment and deployment_status
 // webhook so that we can process these events.
 func (r *Repo) InstallGitHubHook() error {

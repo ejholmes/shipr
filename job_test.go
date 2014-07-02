@@ -16,7 +16,7 @@ func testRepo(t *testing.T) *Repo {
 
 func testJob(t *testing.T) *Job {
 	repo := testRepo(t)
-	job := &Job{RepoID: repo.ID, Guid: 1234, Sha: "4321", Environment: "production"}
+	job := &Job{RepoID: repo.ID, RawGuid: 1234, RawSha: "4321", RawEnvironment: "production"}
 	err := Jobs.Insert(job)
 	if err != nil {
 		t.Error(err)

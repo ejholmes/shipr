@@ -21,14 +21,17 @@ type JobRepository struct {
 
 // Job is our reference to a deployment.
 type Job struct {
-	ID          int
-	RepoID      int `db:"repo_id"`
-	Guid        int
-	Sha         string
-	Force       bool
-	Description string
-	Environment string
-	ExitStatus  *int `db:"exit_status"`
+	ID             int
+	RepoID         int    `db:"repo_id"`
+	RawGuid        int    `db:"guid"`
+	RawSha         string `db:"sha"`
+	Force          bool
+	RawDescription string `db:"description"`
+	RawEnvironment string `db:"environment"`
+	ExitStatus     *int   `db:"exit_status"`
+
+	// Memoized repo instance
+	repo *Repo `db:"-"`
 }
 
 // LogLineRepository has methods for adding and removing log lines.
@@ -45,19 +48,20 @@ type LogLine struct {
 	Timestamp time.Time
 }
 
-// CreateFromJobDescriber takes a Jobable and inserts a new Job.
-func (r *JobRepository) CreateFromJobDescriber(d JobDescriber) (*Job, error) {
+// CreateFromDescriber takes a Jobable and inserts a new Job.
+func (r *JobRepository) CreateFromDescriber(d Describer) (*Job, error) {
 	repo, err := Repos.FindOrCreateByName(d.RepoName())
 	if err != nil {
 		return nil, err
 	}
 
 	job := &Job{
-		RepoID:      repo.ID,
-		Guid:        d.Guid(),
-		Sha:         d.Sha(),
-		Environment: d.Environment(),
-		Description: d.Description(),
+		repo:           repo,
+		RepoID:         repo.ID,
+		RawGuid:        d.Guid(),
+		RawSha:         d.Sha(),
+		RawEnvironment: d.Environment(),
+		RawDescription: d.Description(),
 	}
 
 	err = r.Insert(job)
@@ -129,6 +133,18 @@ func (j *Job) IsDone() bool {
 	}
 }
 
+// Returns the repo for this job.
+func (j *Job) Repo() (*Repo, error) {
+	if j.repo == nil {
+		repo, err := Repos.Find(j.RepoID)
+		if err != nil {
+			return nil, err
+		}
+		j.repo = repo
+	}
+	return j.repo, nil
+}
+
 // Returns the status for this job. Returns StatusPending if the exit code
 // is nil.
 func (j *Job) Status() (status JobStatus) {
@@ -141,6 +157,22 @@ func (j *Job) Status() (status JobStatus) {
 	}
 	return
 }
+
+// Methods to implement the Describer interface.
+
+func (j *Job) RepoName() string {
+	repo, err := j.Repo()
+	if err != nil {
+		return ""
+	}
+	return repo.Name
+}
+
+func (j *Job) Description() string { return j.RawDescription }
+func (j *Job) Environment() string { return j.RawEnvironment }
+func (j *Job) Guid() int           { return j.RawGuid }
+func (j *Job) Sha() string         { return j.RawSha }
+func (j *Job) Ref() string         { return "" }
 
 // Run (Deploy) the job.
 func (j *Job) Run() error {
