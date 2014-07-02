@@ -47,8 +47,8 @@ var (
 	dbmap *gorp.DbMap
 
 	// Repositories
-	repos *RepoRepository
-	jobs  *JobRepository
+	Repos *RepoRepository
+	Jobs  *JobRepository
 
 	// Deployers
 	deployer Deployer
@@ -83,8 +83,8 @@ func initDb() {
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
 
-	repos = &RepoRepository{dbmap}
-	jobs = &JobRepository{dbmap}
+	Repos = &RepoRepository{dbmap}
+	Jobs = &JobRepository{dbmap}
 }
 
 func main() {
@@ -96,7 +96,7 @@ func main() {
 
 // Deploy takes a Deployable, creates a Job for it and runs the deployment.
 func Deploy(d Deployable) error {
-	j, err := jobs.CreateByDeployable(d)
+	j, err := Jobs.CreateByDeployable(d)
 	if err != nil {
 		return err
 	}
