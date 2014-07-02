@@ -2,7 +2,6 @@ package shipr
 
 import (
 	"database/sql"
-	"log"
 
 	"bitbucket.org/liamstask/goose/lib/goose"
 
@@ -31,21 +30,20 @@ func init() {
 	if Env == "" {
 		Env = "development"
 	}
-
-	initDB()
 }
 
-func initDB() {
+// Connect connects to postgres and initializes the repositories.
+func Connect(path string) error {
 	var err error
 
-	dbconf, err := goose.NewDBConf("db", Env)
+	dbconf, err := goose.NewDBConf(path, Env)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	db, err = sql.Open(dbconf.Driver.Name, dbconf.Driver.OpenStr)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	dbmap = &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
@@ -55,6 +53,8 @@ func initDB() {
 
 	Repos = &RepoRepository{dbmap}
 	Jobs = &JobRepository{dbmap}
+
+	return nil
 }
 
 // Deploy takes a Deployable, creates a Job for it and runs the deployment.
