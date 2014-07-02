@@ -44,25 +44,19 @@ func (r *RepoRepository) Insert(repo *Repo) error {
 // FindByName trys to find a repo by name. If the repo is not found,
 // returns nil.
 func (r *RepoRepository) FindByName(name string) (*Repo, error) {
-	var repo Repo
-
-	err := r.dbmap.SelectOne(&repo, `SELECT * FROM repos WHERE name = $1 LIMIT 1`, name)
-	if err != nil {
-		return nil, err
-	}
-
-	if repo.ID == 0 {
-		return nil, nil
-	}
-
-	return &repo, err
+	return r.findBy("name", name)
 }
 
 // Find finds a repo by id.
 func (r *RepoRepository) Find(id int) (*Repo, error) {
+	return r.findBy("id", id)
+}
+
+// findBy finds a Repo by a field.
+func (r *RepoRepository) findBy(field string, v interface{}) (*Repo, error) {
 	var repo Repo
 
-	err := r.dbmap.SelectOne(&repo, `SELECT * FROM repos WHERE id = $1 LIMIT 1`, id)
+	err := r.dbmap.SelectOne(&repo, `SELECT * FROM repos WHERE `+field+` = $1 LIMIT 1`, v)
 	if err != nil {
 		return nil, err
 	}
