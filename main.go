@@ -11,10 +11,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Deployable is an interface that's used for creating Job's. We implement this
+// JobDescriber is an interface that's used for creating Job's. We implement this
 // interface on the GitHubDeployment struct, so that we can deploy github's
 // deployment events directly.
-type Deployable interface {
+type JobDescriber interface {
 	// Guid should return a unique identifier for this deployment.
 	Guid() int
 
@@ -94,9 +94,9 @@ func main() {
 	http.ListenAndServe(":3001", server)
 }
 
-// Deploy takes a Deployable, creates a Job for it and runs the deployment.
-func Deploy(d Deployable) error {
-	j, err := Jobs.CreateByDeployable(d)
+// Deploy takes a Jobable, creates a Job for it and runs the deployment.
+func Deploy(d JobDescriber) error {
+	j, err := Jobs.CreateFromJobDescriber(d)
 	if err != nil {
 		return err
 	}

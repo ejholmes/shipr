@@ -45,8 +45,8 @@ type LogLine struct {
 	Timestamp time.Time
 }
 
-// CreateByDeployable takes a Deployable and inserts a new Job.
-func (r *JobRepository) CreateByDeployable(d Deployable) (*Job, error) {
+// CreateFromJobDescriber takes a Jobable and inserts a new Job.
+func (r *JobRepository) CreateFromJobDescriber(d JobDescriber) (*Job, error) {
 	repo, err := Repos.FindOrCreateByName(d.RepoName())
 	if err != nil {
 		return nil, err
@@ -165,7 +165,7 @@ func (r *LogLineRepository) Insert(logLine *LogLine) error {
 func (r *LogLineRepository) All() ([]LogLine, error) {
 	var lines []LogLine
 
-	_, err := dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, r.job.ID)
+	_, err := r.dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, r.job.ID)
 	if err != nil {
 		return nil, err
 	}
