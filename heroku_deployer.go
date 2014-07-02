@@ -18,7 +18,7 @@ func NewHerokuDeployer(username, password string) *HerokuDeployer {
 // Methods to implement the Deployer interface.
 
 // Deploy deploys a job to Heroku.
-func (h *HerokuDeployer) Deploy(j *Job) error {
+func (h *HerokuDeployer) Deploy(d Deployable) error {
 	addons, err := h.Client.AddonList("r101-shipr", nil)
 	if err != nil {
 		panic(err)

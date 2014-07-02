@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"time"
 
 	"bitbucket.org/liamstask/goose/lib/goose"
 
@@ -34,9 +35,15 @@ type JobDescriber interface {
 	Description() string
 }
 
+// Deployable is an interface the Job implements.
+type Deployable interface {
+	// AddLine adds a log line to the output.
+	AddLine(string, time.Time) error
+}
+
 // Deployers are capable of deploying jobs.
 type Deployer interface {
-	Deploy(*Job) error
+	Deploy(Deployable) error
 }
 
 var (

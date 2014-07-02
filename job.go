@@ -115,8 +115,9 @@ func (j *Job) LogLines() *LogLineRepository {
 }
 
 // AddLine adds a line of log output to this job.
-func (j *Job) AddLine(output string, timestamp time.Time) (*LogLine, error) {
-	return j.LogLines().Add(output, timestamp)
+func (j *Job) AddLine(output string, timestamp time.Time) error {
+	_, err := j.LogLines().Add(output, timestamp)
+	return err
 }
 
 // Returns if the job is done or not.
