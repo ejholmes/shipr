@@ -1,10 +1,6 @@
 package main
 
-import (
-	"time"
-
-	"github.com/coopernurse/gorp"
-)
+import "time"
 
 type JobStatus int
 
@@ -13,11 +9,6 @@ const (
 	StatusFailed
 	StatusSucceeded
 )
-
-// JobRepository has methods for adding and removing jobs.
-type JobRepository struct {
-	dbmap *gorp.DbMap
-}
 
 // Job is our reference to a deployment.
 type Job struct {
@@ -32,70 +23,6 @@ type Job struct {
 
 	// Memoized repo instance
 	repo *Repo `db:"-"`
-}
-
-// LogLineRepository has methods for adding and removing log lines.
-type LogLineRepository struct {
-	job   *Job
-	dbmap *gorp.DbMap
-}
-
-// LogLine represents a line of log output from the deploy job.
-type LogLine struct {
-	ID        int
-	JobID     int `db:"job_id"`
-	Output    string
-	Timestamp time.Time
-}
-
-// CreateFromDescriber takes a Jobable and inserts a new Job.
-func (r *JobRepository) CreateFromDescriber(d Describer) (*Job, error) {
-	repo, err := Repos.FindOrCreateByName(d.RepoName())
-	if err != nil {
-		return nil, err
-	}
-
-	job := &Job{
-		repo:           repo,
-		RepoID:         repo.ID,
-		RawGuid:        d.Guid(),
-		RawSha:         d.Sha(),
-		RawEnvironment: d.Environment(),
-		RawDescription: d.Description(),
-	}
-
-	err = r.Insert(job)
-	if err != nil {
-		return nil, err
-	}
-
-	return job, nil
-}
-
-// First finds the first job.
-func (r *JobRepository) First() (*Job, error) {
-	var job Job
-
-	err := r.dbmap.SelectOne(&job, `SELECT * FROM jobs LIMIT 1`)
-	if err != nil {
-		return nil, err
-	}
-
-	return &job, nil
-}
-
-// Insert inserts the Job into the database.
-func (r *JobRepository) Insert(job *Job) error {
-	return r.dbmap.Insert(job)
-}
-
-// Total returns the total number of Jobs.
-func (r *JobRepository) Total() (int64, error) {
-	count, err := r.dbmap.SelectInt(`SELECT count(*) from jobs`)
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
 }
 
 // Output returns the log output for this job.
@@ -177,31 +104,4 @@ func (j *Job) Ref() string         { return "" }
 // Run (Deploy) the job.
 func (j *Job) Run() error {
 	return deployer.Deploy(j)
-}
-
-// Add adds a LogLine.
-func (r *LogLineRepository) Add(output string, timestamp time.Time) (*LogLine, error) {
-	l := &LogLine{JobID: r.job.ID, Output: output, Timestamp: timestamp}
-	err := r.Insert(l)
-	if err != nil {
-		return nil, err
-	}
-	return l, nil
-}
-
-// Insert inserts a LogLine.
-func (r *LogLineRepository) Insert(logLine *LogLine) error {
-	return r.dbmap.Insert(logLine)
-}
-
-// AllForJob returns a slice of LogLine for the Job.
-func (r *LogLineRepository) All() ([]LogLine, error) {
-	var lines []LogLine
-
-	_, err := r.dbmap.Select(&lines, `SELECT * FROM log_lines WHERE job_id = $1 ORDER BY timestamp`, r.job.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	return lines, nil
 }
