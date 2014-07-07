@@ -87,12 +87,12 @@ func (j *Job) Status() (status JobStatus) {
 
 // Methods to implement the Deployment interface.
 
-func (j *Job) RepoName() string {
+func (j *Job) RepoName() RepoName {
 	repo, err := j.Repo()
 	if err != nil {
 		return ""
 	}
-	return repo.Name
+	return repo.RepoName()
 }
 
 func (j *Job) Description() string { return j.RawDescription }

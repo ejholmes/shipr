@@ -36,8 +36,8 @@ func (d *GitHubDeployment) Guid() int {
 }
 
 // RepoName returns the GitHub repository name related to this deployment.
-func (d *GitHubDeployment) RepoName() string {
-	return d.Repository.FullName
+func (d *GitHubDeployment) RepoName() RepoName {
+	return RepoName(d.Repository.FullName)
 }
 
 // Sha returns the git sha to deploy.

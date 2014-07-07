@@ -11,3 +11,7 @@ type Repo struct {
 func (r *Repo) InstallGitHubHook() error {
 	return nil
 }
+
+func (r *Repo) RepoName() RepoName {
+	return RepoName(r.Name)
+}

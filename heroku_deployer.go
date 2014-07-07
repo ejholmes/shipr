@@ -32,7 +32,13 @@ type HerokuDeploy struct {
 // AppName returns the name of the app for this github repo/environment combo.
 func (d *HerokuDeploy) AppName() string {
 	repoName := d.RepoName()
-	return repoName
+
+	switch d.Environment() {
+	case "production":
+		return repoName.Repo()
+	default:
+		return repoName.Repo() + "-" + d.Environment()
+	}
 }
 
 // ArchiveLink returns the URL to download the source for this Sha.

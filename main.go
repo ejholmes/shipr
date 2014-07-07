@@ -19,7 +19,7 @@ type Deployment interface {
 	Guid() int
 
 	// RepoName should return the string name of the repo to deploy.
-	RepoName() string
+	RepoName() RepoName
 
 	// Sha should return the git sha that we want to deploy.
 	Sha() string
