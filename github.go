@@ -28,7 +28,7 @@ type GitHubDeploymentStatus struct {
 	Deployment GitHubDeployment
 }
 
-// Methods to implement the Deployable interface.
+// Methods to implement the Deployment interface.
 
 // Guid returns the unique identifier for this github deployment.
 func (d *GitHubDeployment) Guid() int {
