@@ -7,8 +7,8 @@ type JobRepository struct {
 	dbmap *gorp.DbMap
 }
 
-// CreateFromDescriber takes a Jobable and inserts a new Job.
-func (r *JobRepository) CreateFromDescriber(d Describer) (*Job, error) {
+// CreateFromDeployment takes a Jobable and inserts a new Job.
+func (r *JobRepository) CreateFromDeployment(d Deployment) (*Job, error) {
 	repo, err := Repos.FindOrCreateByName(d.RepoName())
 	if err != nil {
 		return nil, err

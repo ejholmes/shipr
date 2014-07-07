@@ -12,9 +12,9 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Describer is an interface that's describes information about a deployment.
+// Deployment is an interface that's describes information about a deployment.
 // This can be used to create jobs, and is also implemented by Job.
-type Describer interface {
+type Deployment interface {
 	// Guid should return a unique identifier for this deployment.
 	Guid() int
 
@@ -37,7 +37,7 @@ type Describer interface {
 // Deployable is an interface the Job implements and provides methods that
 // deployers can use to get information about the Job, and update it.
 type Deployable interface {
-	Describer
+	Deployment
 
 	// AddLine adds a log line to the output.
 	AddLine(string, time.Time) error
@@ -104,8 +104,8 @@ func main() {
 }
 
 // Deploy takes a Jobable, creates a Job for it and runs the deployment.
-func Deploy(d Describer) error {
-	j, err := Jobs.CreateFromDescriber(d)
+func Deploy(d Deployment) error {
+	j, err := Jobs.CreateFromDeployment(d)
 	if err != nil {
 		return err
 	}

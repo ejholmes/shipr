@@ -85,7 +85,7 @@ func (j *Job) Status() (status JobStatus) {
 	return
 }
 
-// Methods to implement the Describer interface.
+// Methods to implement the Deployment interface.
 
 func (j *Job) RepoName() string {
 	repo, err := j.Repo()
