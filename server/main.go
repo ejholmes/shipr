@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 
@@ -8,6 +9,14 @@ import (
 )
 
 func main() {
-	s := shipr.New()
-	log.Fatal(http.ListenAndServe(":3001", NewServer(s)))
+	var (
+		dbdir = flag.String("dbdir", "db", "The db dir containing a dbconf.yml file.")
+		env   = flag.String("env", "development", "The environment to run in.")
+	)
+	c, err := shipr.New(*dbdir, *env)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer c.Close()
+	log.Fatal(http.ListenAndServe(":3001", NewServer(c)))
 }

@@ -1,4 +1,4 @@
-.PHONY: down up worker
+.PHONY: down up build
 
 test:
 	godep go test ./...
