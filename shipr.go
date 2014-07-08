@@ -24,6 +24,12 @@ func New(path, env string) (*Shipr, error) {
 	}, nil
 }
 
+// Deploy is the primary interface into deploy things. It takes an object that conforms
+// to the Deployment interface, creates a Job then runs it.
+func (c *Shipr) Deploy(d Deployment) error {
+	return nil
+}
+
 func (c *Shipr) Close() error {
 	return c.DB.Close()
 }
