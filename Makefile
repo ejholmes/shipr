@@ -14,11 +14,8 @@ up:
 	goose -env development up
 	goose -env test up
 
-install:
-	godep go install
+build:
+	godep go build -o build/server github.com/remind101/shipr/server
 
-run: install
-	shipr
-
-worker:
-	cd worker && make install
+run: build
+	build/server
