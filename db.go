@@ -31,6 +31,7 @@ func NewDB(path, env string) (*DB, error) {
 	}
 
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
+	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 
 	return &DB{DBConf: dbconf, DB: db, DbMap: dbmap}, nil
 }

@@ -6,6 +6,9 @@ type Shipr struct {
 
 	// The DB connection.
 	*DB
+
+	// Repositories
+	Repos *RepoRepository
 }
 
 // Returns a new Shipr context.
@@ -14,9 +17,13 @@ func New(path, env string) (*Shipr, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Shipr{Env: env, DB: db}, nil
+	return &Shipr{
+		Env:   env,
+		DB:    db,
+		Repos: &RepoRepository{},
+	}, nil
 }
 
-func (c *Shipr) Close() {
-	c.DB.Close()
+func (c *Shipr) Close() error {
+	return c.DB.Close()
 }
