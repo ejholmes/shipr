@@ -2,6 +2,14 @@ package shipr
 
 import "time"
 
+type JobStatus int
+
+const (
+	StatusPending JobStatus = iota
+	StatusFailed
+	StatusSucceeded
+)
+
 // JobsService manages the `jobs` table.
 type JobsService struct {
 	*DB
@@ -34,9 +42,22 @@ type Job struct {
 	Environment string
 	Description string
 	Force       bool
-	ExitStatus  int `db:"exit_status"`
+	ExitStatus  *int `db:"exit_status"`
 
 	repo *Repo `db:"-"`
+}
+
+// Returns the status for this job. Returns StatusPending if the exit code
+// is nil.
+func (j *Job) Status() (status JobStatus) {
+	if j.ExitStatus != nil {
+		if *j.ExitStatus == 0 {
+			status = StatusSucceeded
+		} else {
+			status = StatusFailed
+		}
+	}
+	return
 }
 
 // DeploymentJob wraps Job to implement the Deployment interface.
