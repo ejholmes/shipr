@@ -9,10 +9,6 @@ type Shipr struct {
 	// The DB connection.
 	*DB
 
-	// Repositories.
-	Repos *ReposService
-	Jobs  *JobsService
-
 	// The deployer we'll use to deploy jobs.
 	Deployer
 
@@ -33,8 +29,6 @@ func New(path, env string) (*Shipr, error) {
 	return &Shipr{
 		Env:    env,
 		DB:     db,
-		Repos:  &ReposService{db},
-		Jobs:   &JobsService{db},
 		Github: gh,
 	}, nil
 }

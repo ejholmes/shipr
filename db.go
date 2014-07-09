@@ -17,6 +17,10 @@ type DB struct {
 
 	// The gorp dbmap. Also mixin methods.
 	*gorp.DbMap
+
+	// Services
+	Repos *ReposService
+	Jobs  *JobsService
 }
 
 func NewDB(path, env string) (*DB, error) {
@@ -33,7 +37,10 @@ func NewDB(path, env string) (*DB, error) {
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 
-	return &DB{DBConf: dbconf, DB: db, DbMap: dbmap}, nil
+	d := &DB{DBConf: dbconf, DB: db, DbMap: dbmap}
+	d.Repos = &ReposService{d}
+	d.Jobs = &JobsService{d}
+	return d, nil
 }
 
 func (db *DB) Close() error {
