@@ -22,7 +22,7 @@ func (s *JobsService) CreateFromDeployment(d Deployment) (*Job, error) {
 	}
 
 	job := &Job{
-		repo:        repo,
+		Repo:        repo,
 		RepoID:      repo.ID,
 		Guid:        d.Guid(),
 		Sha:         d.Sha(),
@@ -44,7 +44,7 @@ type Job struct {
 	Force       bool
 	ExitStatus  *int `db:"exit_status"`
 
-	repo *Repo `db:"-"`
+	Repo *Repo `db:"-"`
 }
 
 // Returns the status for this job. Returns StatusPending if the exit code
@@ -58,6 +58,15 @@ func (j *Job) Status() (status JobStatus) {
 		}
 	}
 	return
+}
+
+// Returns if the job is done or not.
+func (j *Job) IsDone() bool {
+	if j.Status() != StatusPending {
+		return true
+	} else {
+		return false
+	}
 }
 
 // DeploymentJob wraps Job to implement the Deployment interface.

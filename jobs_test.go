@@ -23,3 +23,23 @@ func Test_Job_Status(t *testing.T) {
 		}
 	}
 }
+
+func Test_Job_IsDone(t *testing.T) {
+	status := 1
+
+	tests := []struct {
+		Status   *int
+		Expected bool
+	}{
+		{nil, false},
+		{&status, true},
+	}
+
+	for _, test := range tests {
+		job := &Job{ExitStatus: test.Status}
+
+		if job.IsDone() != test.Expected {
+			t.Fatalf("Expected IsDone() to return %v", test.Expected)
+		}
+	}
+}
