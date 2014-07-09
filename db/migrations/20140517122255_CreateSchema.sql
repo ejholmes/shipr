@@ -13,6 +13,7 @@ CREATE TABLE jobs (
   repo_id int NOT NULL references repos(id),
   guid character varying(255) NOT NULL,
   sha character varying(255) NOT NULL,
+  ref character varying(255) NOT NULL,
   environment character varying(255) NOT NULL,
   force boolean NOT NULL DEFAULT false,
   description text,

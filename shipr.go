@@ -27,9 +27,10 @@ func New(path, env string) (*Shipr, error) {
 	gh := github.NewClient(nil)
 
 	return &Shipr{
-		Env:    env,
-		DB:     db,
-		Github: gh,
+		Env:      env,
+		DB:       db,
+		Deployer: &HerokuDeployer{},
+		Github:   gh,
 	}, nil
 }
 

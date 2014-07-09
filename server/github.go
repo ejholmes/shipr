@@ -44,12 +44,21 @@ type GitHubDeployment struct {
 
 func (d *GitHubDeployment) Guid() int { return *d.Deployment.ID }
 func (d *GitHubDeployment) RepoName() shipr.RepoName {
-	return shipr.RepoName(*d.Deployment.Repository.FullName)
+	return shipr.RepoName(safeString(d.Deployment.Repository.FullName))
 }
-func (d *GitHubDeployment) Sha() string         { return *d.Deployment.Sha }
-func (d *GitHubDeployment) Ref() string         { return *d.Deployment.Ref }
-func (d *GitHubDeployment) Environment() string { return *d.Deployment.Environment }
-func (d *GitHubDeployment) Description() string { return *d.Deployment.Description }
+func (d *GitHubDeployment) Sha() string         { return safeString(d.Deployment.Sha) }
+func (d *GitHubDeployment) Ref() string         { return safeString(d.Deployment.Ref) }
+func (d *GitHubDeployment) Environment() string { return safeString(d.Deployment.Environment) }
+func (d *GitHubDeployment) Description() string {
+	return safeString(d.Deployment.Description)
+}
+
+func safeString(s *string) string {
+	if s == nil {
+		return ""
+	}
+	return *s
+}
 
 type DeploymentHandler struct {
 	*shipr.Shipr

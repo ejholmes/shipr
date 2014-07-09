@@ -27,14 +27,14 @@ func (s *JobsService) CreateFromDeployment(d Deployment) (*Job, error) {
 
 type Job struct {
 	ID          int
-	RepoID      int
+	RepoID      int `db:"repo_id"`
 	Guid        int
 	Sha         string
 	Ref         string
 	Environment string
 	Description string
 	Force       bool
-	ExitStatus  int
+	ExitStatus  int `db:"exit_status"`
 
 	repo *Repo `db:"-"`
 }
