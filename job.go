@@ -2,24 +2,27 @@ package shipr
 
 import "time"
 
-// Job is an implementation of the Deployment/Deployable interface that is backed
-// by postgres.
 type Job struct {
-	ID             int    `db:"id"`
-	RawGuid        int    `db:"guid"`
-	RawSha         string `db:"sha"`
-	RawRef         string `db:"ref"`
-	RawEnvironment string `db:"environment"`
-	RawDescription string `db:"description"`
+	ID          int
+	Guid        int
+	Sha         string
+	Ref         string
+	Environment string
+	Description string
 }
 
-func (j *Job) Guid() int           { return j.RawGuid }
-func (j *Job) RepoName() RepoName  { return RepoName("") }
-func (j *Job) Sha() string         { return j.RawSha }
-func (j *Job) Ref() string         { return j.RawRef }
-func (j *Job) Environment() string { return j.RawEnvironment }
-func (j *Job) Description() string { return j.RawDescription }
+// DeploymentJob wraps Job to implement the Deployment interface.
+type DeploymentJob struct {
+	*Job
+}
 
-func (j *Job) AddLine(output string, timestamp time.Time) error {
+func (j *DeploymentJob) Guid() int           { return j.Job.Guid }
+func (j *DeploymentJob) RepoName() RepoName  { return RepoName("") }
+func (j *DeploymentJob) Sha() string         { return j.Job.Sha }
+func (j *DeploymentJob) Ref() string         { return j.Job.Ref }
+func (j *DeploymentJob) Environment() string { return j.Job.Environment }
+func (j *DeploymentJob) Description() string { return j.Job.Description }
+
+func (j *DeploymentJob) AddLine(output string, timestamp time.Time) error {
 	return nil
 }
