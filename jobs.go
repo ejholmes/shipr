@@ -7,17 +7,36 @@ type JobsService struct {
 	*DB
 }
 
-func (r *JobsService) CreateFromDeployment(d Deployment) (*Job, error) {
-	return &Job{}, nil
+func (s *JobsService) CreateFromDeployment(d Deployment) (*Job, error) {
+	repo, err := s.Repos.FindOrCreateByName(string(d.RepoName()))
+	if err != nil {
+		return nil, err
+	}
+
+	job := &Job{
+		repo:        repo,
+		RepoID:      repo.ID,
+		Guid:        d.Guid(),
+		Sha:         d.Sha(),
+		Environment: d.Environment(),
+		Description: d.Description(),
+	}
+
+	return job, s.Insert(job)
 }
 
 type Job struct {
 	ID          int
+	RepoID      int
 	Guid        int
 	Sha         string
 	Ref         string
 	Environment string
 	Description string
+	Force       bool
+	ExitStatus  int
+
+	repo *Repo `db:"-"`
 }
 
 // DeploymentJob wraps Job to implement the Deployment interface.

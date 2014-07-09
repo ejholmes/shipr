@@ -7,28 +7,45 @@ type ReposService struct {
 	*DB
 }
 
+// FindOrCreateByName tries to find the repo by name or it creates it.
+func (s *ReposService) FindOrCreateByName(name string) (*Repo, error) {
+	repo, err := s.FindByName(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if repo == nil {
+		repo, err = s.CreateByName(name)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return repo, nil
+}
+
 // CreateByName creates a new Repo by name.
-func (r *ReposService) CreateByName(name string) (*Repo, error) {
+func (s *ReposService) CreateByName(name string) (*Repo, error) {
 	repo := &Repo{Name: name}
-	return repo, r.Insert(repo)
+	return repo, s.Insert(repo)
 }
 
 // FindByName trys to find a repo by name. If the repo is not found,
 // returns nil.
-func (r *ReposService) FindByName(name string) (*Repo, error) {
-	return r.findBy("name", name)
+func (s *ReposService) FindByName(name string) (*Repo, error) {
+	return s.findBy("name", name)
 }
 
 // Find finds a repo by id.
-func (r *ReposService) Find(id int) (*Repo, error) {
-	return r.findBy("id", id)
+func (s *ReposService) Find(id int) (*Repo, error) {
+	return s.findBy("id", id)
 }
 
 // findBy finds a Repo by a field.
-func (r *ReposService) findBy(field string, v interface{}) (*Repo, error) {
+func (s *ReposService) findBy(field string, v interface{}) (*Repo, error) {
 	var repo Repo
 
-	err := r.SelectOne(&repo, `SELECT * FROM repos WHERE `+field+` = $1 LIMIT 1`, v)
+	err := s.SelectOne(&repo, `SELECT * FROM repos WHERE `+field+` = $1 LIMIT 1`, v)
 	if err != nil {
 		return nil, err
 	}
