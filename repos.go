@@ -15,10 +15,7 @@ func (s *ReposService) FindOrCreateByName(name string) (*Repo, error) {
 	}
 
 	if repo == nil {
-		repo, err = s.CreateByName(name)
-		if err != nil {
-			return nil, err
-		}
+		return s.CreateByName(name)
 	}
 
 	return repo, nil
