@@ -2,6 +2,20 @@ package shipr
 
 import "time"
 
+// JobsService manages the `jobs` table.
+type JobsService struct {
+	*DB
+}
+
+func (r *JobsService) CreateFromDeployment(d Deployment) (*Job, error) {
+	return &Job{}, nil
+}
+
+// Insert inserts the Job into the database.
+func (r *JobsService) Insert(job *Job) error {
+	return r.Insert(job)
+}
+
 type Job struct {
 	ID          int
 	Guid        int
