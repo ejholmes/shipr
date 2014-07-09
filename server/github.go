@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
 	"github.com/remind101/shipr/clients/github"
+	"github.com/remind101/shipr/util"
 )
 
 const GitHubEventHeader = "X-GitHub-Event"
@@ -44,20 +45,13 @@ type GitHubDeployment struct {
 
 func (d *GitHubDeployment) Guid() int { return *d.Deployment.ID }
 func (d *GitHubDeployment) RepoName() shipr.RepoName {
-	return shipr.RepoName(safeString(d.Deployment.Repository.FullName))
+	return shipr.RepoName(util.SafeString(d.Deployment.Repository.FullName))
 }
-func (d *GitHubDeployment) Sha() string         { return safeString(d.Deployment.Sha) }
-func (d *GitHubDeployment) Ref() string         { return safeString(d.Deployment.Ref) }
-func (d *GitHubDeployment) Environment() string { return safeString(d.Deployment.Environment) }
+func (d *GitHubDeployment) Sha() string         { return util.SafeString(d.Deployment.Sha) }
+func (d *GitHubDeployment) Ref() string         { return util.SafeString(d.Deployment.Ref) }
+func (d *GitHubDeployment) Environment() string { return util.SafeString(d.Deployment.Environment) }
 func (d *GitHubDeployment) Description() string {
-	return safeString(d.Deployment.Description)
-}
-
-func safeString(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
+	return util.SafeString(d.Deployment.Description)
 }
 
 type DeploymentHandler struct {
