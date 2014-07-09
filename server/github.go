@@ -1,11 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
+	"github.com/remind101/shipr/clients/github"
 )
 
 const GitHubEventHeader = "X-GitHub-Event"
@@ -34,16 +34,35 @@ func NewGitHubHandler(c *shipr.Shipr) *GitHubHandler {
 }
 
 func (h *GitHubHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r)
 	h.handler.ServeHTTP(w, r)
 }
+
+// GitHubDeployment wraps a github.Deployment to implement the shipr.Deployment interface.
+type GitHubDeployment struct {
+	*github.Deployment
+}
+
+func (d *GitHubDeployment) Guid() int { return *d.Deployment.ID }
+func (d *GitHubDeployment) RepoName() shipr.RepoName {
+	return shipr.RepoName(*d.Deployment.Repository.FullName)
+}
+func (d *GitHubDeployment) Sha() string         { return *d.Deployment.Sha }
+func (d *GitHubDeployment) Ref() string         { return *d.Deployment.Ref }
+func (d *GitHubDeployment) Environment() string { return *d.Deployment.Environment }
+func (d *GitHubDeployment) Description() string { return *d.Deployment.Description }
 
 type DeploymentHandler struct {
 	*shipr.Shipr
 }
 
 func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Deployment")
+	var d github.Deployment
+	decodeRequest(r, &d)
+
+	err := h.Deploy(&GitHubDeployment{&d})
+	if err != nil {
+		panic(err)
+	}
 }
 
 type DeploymentStatusHandler struct {
@@ -51,5 +70,4 @@ type DeploymentStatusHandler struct {
 }
 
 func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("DeploymentStatus")
 }
