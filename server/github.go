@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,36 +10,46 @@ import (
 
 const GitHubEventHeader = "X-GitHub-Event"
 
-type GitHubEventHandler func(*shipr.Shipr, http.ResponseWriter, *http.Request)
-
-var GitHubEventHandlers = map[string]GitHubEventHandler{
-	"deployment":        HandleDeployment,
-	"deployment_status": HandleDeploymentStatus,
-}
+type GitHubEventHandler http.Handler
 
 // GitHubHandler demuxes incoming webhooks from GitHub and handles them.
 type GitHubHandler struct {
 	handler http.Handler
 }
 
-func NewGitHubHandler() *GitHubHandler {
+func NewGitHubHandler(c *shipr.Shipr) *GitHubHandler {
 	m := mux.NewRouter()
 	h := &GitHubHandler{m}
 
-	for event, f := range GitHubEventHandlers {
-		handler := func(w http.ResponseWriter, r *http.Request) { f(nil, w, r) }
-		m.HandleFunc("/github", handler).Methods("POST").Headers(GitHubEventHeader, event)
+	var handlers = map[string]GitHubEventHandler{
+		"deployment":        &DeploymentHandler{c},
+		"deployment_status": &DeploymentStatusHandler{c},
+	}
+
+	for event, handler := range handlers {
+		m.Methods("POST").Headers(GitHubEventHeader, event).Handler(handler)
 	}
 
 	return h
 }
 
 func (h *GitHubHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r)
 	h.handler.ServeHTTP(w, r)
 }
 
-func HandleDeployment(c *shipr.Shipr, w http.ResponseWriter, r *http.Request) {
+type DeploymentHandler struct {
+	*shipr.Shipr
 }
 
-func HandleDeploymentStatus(c *shipr.Shipr, w http.ResponseWriter, r *http.Request) {
+func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Deployment")
+}
+
+type DeploymentStatusHandler struct {
+	*shipr.Shipr
+}
+
+func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("DeploymentStatus")
 }

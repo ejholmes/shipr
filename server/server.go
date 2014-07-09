@@ -13,18 +13,18 @@ type Server struct {
 	handler http.Handler
 }
 
-func NewServer(s *shipr.Shipr) *Server {
+func NewServer(c *shipr.Shipr) *Server {
 	m := mux.NewRouter()
 
 	// GitHub webhooks.
-	m.Handle("/github", NewGitHubHandler())
+	m.Handle("/github", NewGitHubHandler(c))
 
 	// Middleware.
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
 	n.UseHandler(m)
 
-	return &Server{s, n}
+	return &Server{c, n}
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
