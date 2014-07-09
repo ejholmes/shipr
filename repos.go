@@ -7,11 +7,6 @@ type ReposService struct {
 	*DB
 }
 
-// Insert inserts the Repo into the database.
-func (r *ReposService) Insert(repo *Repo) error {
-	return r.Insert(repo)
-}
-
 // CreateByName creates a new Repo by name.
 func (r *ReposService) CreateByName(name string) (*Repo, error) {
 	repo := &Repo{Name: name}
