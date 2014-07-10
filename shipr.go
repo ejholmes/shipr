@@ -1,5 +1,7 @@
 package shipr
 
+import "github.com/remind101/shipr/heroku"
+
 type Options struct {
 	Env         string
 	DBDir       string
@@ -30,7 +32,7 @@ func New(options *Options) (*Shipr, error) {
 
 	// Setup a client for talking to GitHub and Heroku.
 	g := newGitHubClient(options.GitHubToken)
-	h := newHerokuClient(options.HerokuToken)
+	h := heroku.NewClient(options.HerokuToken)
 
 	// Setup the Heroku deployer.
 	deployer := NewHerokuDeployer(g, h)
