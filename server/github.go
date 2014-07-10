@@ -15,7 +15,7 @@ type GitHubEventHandler http.Handler
 
 // GitHubHandler demuxes incoming webhooks from GitHub and handles them.
 type GitHubHandler struct {
-	handler http.Handler
+	http.Handler
 }
 
 func NewGitHubHandler(c *shipr.Shipr) *GitHubHandler {
@@ -32,10 +32,6 @@ func NewGitHubHandler(c *shipr.Shipr) *GitHubHandler {
 	}
 
 	return h
-}
-
-func (h *GitHubHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.handler.ServeHTTP(w, r)
 }
 
 // GitHubDeployment wraps a github.Deployment to implement the shipr.Deployment interface.

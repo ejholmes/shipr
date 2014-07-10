@@ -11,7 +11,7 @@ import (
 
 type Server struct {
 	*shipr.Shipr
-	handler http.Handler
+	http.Handler
 }
 
 func NewServer(c *shipr.Shipr) *Server {
@@ -26,10 +26,6 @@ func NewServer(c *shipr.Shipr) *Server {
 	n.UseHandler(m)
 
 	return &Server{c, n}
-}
-
-func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	s.handler.ServeHTTP(w, r)
 }
 
 func decodeRequest(r *http.Request, v interface{}) {
