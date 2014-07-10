@@ -54,8 +54,7 @@ func (d *HerokuDeploy) CreateBuild() (*heroku.Build, error) {
 		return nil, err
 	}
 
-	url := source.String()
-	version := d.Sha()
+	url, version := source.String(), d.Sha()
 
 	return d.Heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
 		SourceBlob: struct {
