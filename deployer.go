@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net/url"
 
-	"code.google.com/p/goauth2/oauth"
-
 	"github.com/ejholmes/go-github/github"
 	"github.com/ejholmes/heroku-go/v3"
 )
@@ -15,17 +13,12 @@ type Deployer interface {
 }
 
 type HerokuDeployer struct {
-	github *github.Client
-	heroku *heroku.Service
+	github *GitHubClient
+	heroku *HerokuClient
 }
 
-func NewHerokuDeployer(gh *github.Client, herokuToken string) *HerokuDeployer {
-	t := &oauth.Transport{
-		Token:     &oauth.Token{AccessToken: herokuToken},
-		Transport: heroku.DefaultTransport,
-	}
-
-	h := heroku.NewService(t.Client())
+func NewHerokuDeployer(gh *GitHubClient, token string) *HerokuDeployer {
+	h := NewHerokuClient(token)
 	return &HerokuDeployer{gh, h}
 }
 

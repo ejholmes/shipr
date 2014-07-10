@@ -1,10 +1,5 @@
 package shipr
 
-import (
-	"code.google.com/p/goauth2/oauth"
-	"github.com/ejholmes/go-github/github"
-)
-
 type Options struct {
 	Env         string
 	DBDir       string
@@ -23,7 +18,7 @@ type Shipr struct {
 	Deployer
 
 	// Clients.
-	GitHub *github.Client
+	GitHub *GitHubClient
 }
 
 // Returns a new Shipr context.
@@ -33,12 +28,8 @@ func New(options *Options) (*Shipr, error) {
 		return nil, err
 	}
 
-	t := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: options.GitHubToken},
-	}
-
 	// Setup a client for talking to GitHub.
-	gh := github.NewClient(t.Client())
+	gh := NewGitHubClient(options.GitHubToken)
 
 	deployer := NewHerokuDeployer(gh, options.HerokuToken)
 
