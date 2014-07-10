@@ -18,7 +18,7 @@ type Shipr struct {
 	Deployer
 
 	// Clients.
-	GitHub *GitHubClient
+	GitHub GitHubClient
 }
 
 // Returns a new Shipr context.
@@ -29,15 +29,16 @@ func New(options *Options) (*Shipr, error) {
 	}
 
 	// Setup a client for talking to GitHub.
-	gh := NewGitHubClient(options.GitHubToken)
+	g := newGitHubClient(options.GitHubToken)
+	h := newHerokuClient(options.HerokuToken)
 
-	deployer := NewHerokuDeployer(gh, options.HerokuToken)
+	deployer := NewHerokuDeployer(g, h)
 
 	return &Shipr{
 		Env:      options.Env,
 		DB:       db,
 		Deployer: deployer,
-		GitHub:   gh,
+		GitHub:   g,
 	}, nil
 }
 
