@@ -5,6 +5,12 @@ import (
 	"github.com/ejholmes/go-github/github"
 )
 
+type Options struct {
+	Env         string
+	DBDir       string
+	GitHubToken string
+}
+
 type Shipr struct {
 	// The environment (e.g. production, staging, etc..)
 	Env string
@@ -20,21 +26,21 @@ type Shipr struct {
 }
 
 // Returns a new Shipr context.
-func New(path, env, githubToken string) (*Shipr, error) {
-	db, err := NewDB(path, env)
+func New(options *Options) (*Shipr, error) {
+	db, err := NewDB(options.DBDir, options.Env)
 	if err != nil {
 		return nil, err
 	}
 
 	t := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: githubToken},
+		Token: &oauth.Token{AccessToken: options.GitHubToken},
 	}
 
 	// Setup a client for talking to GitHub.
 	gh := github.NewClient(t.Client())
 
 	return &Shipr{
-		Env:      env,
+		Env:      options.Env,
 		DB:       db,
 		Deployer: &HerokuDeployer{gh},
 		GitHub:   gh,

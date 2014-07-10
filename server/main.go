@@ -18,7 +18,11 @@ func main() {
 	)
 	flag.Parse()
 
-	c, err := shipr.New(*dbdir, *env, *githubToken)
+	c, err := shipr.New(&shipr.Options{
+		DBDir:       *dbdir,
+		Env:         *env,
+		GitHubToken: *githubToken,
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
