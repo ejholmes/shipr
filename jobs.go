@@ -75,7 +75,7 @@ type DeploymentJob struct {
 }
 
 func (j *DeploymentJob) Guid() int           { return j.Job.Guid }
-func (j *DeploymentJob) RepoName() RepoName  { return RepoName("") }
+func (j *DeploymentJob) RepoName() RepoName  { return j.Repo.RepoName() }
 func (j *DeploymentJob) Sha() string         { return j.Job.Sha }
 func (j *DeploymentJob) Ref() string         { return j.Job.Ref }
 func (j *DeploymentJob) Environment() string { return j.Job.Environment }

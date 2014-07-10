@@ -1,6 +1,9 @@
 package shipr
 
-import "github.com/remind101/shipr/clients/github"
+import (
+	"code.google.com/p/goauth2/oauth"
+	"github.com/ejholmes/go-github/github"
+)
 
 type Shipr struct {
 	// The environment (e.g. production, staging, etc..)
@@ -13,24 +16,28 @@ type Shipr struct {
 	Deployer
 
 	// Clients.
-	Github *github.Client
+	GitHub *github.Client
 }
 
 // Returns a new Shipr context.
-func New(path, env string) (*Shipr, error) {
+func New(path, env, githubToken string) (*Shipr, error) {
 	db, err := NewDB(path, env)
 	if err != nil {
 		return nil, err
 	}
 
+	t := &oauth.Transport{
+		Token: &oauth.Token{AccessToken: githubToken},
+	}
+
 	// Setup a client for talking to GitHub.
-	gh := github.NewClient(nil)
+	gh := github.NewClient(t.Client())
 
 	return &Shipr{
 		Env:      env,
 		DB:       db,
-		Deployer: &HerokuDeployer{},
-		Github:   gh,
+		Deployer: &HerokuDeployer{gh},
+		GitHub:   gh,
 	}, nil
 }
 

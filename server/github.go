@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 
+	"github.com/ejholmes/go-github/github"
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
-	"github.com/remind101/shipr/clients/github"
 	"github.com/remind101/shipr/util"
 )
 
