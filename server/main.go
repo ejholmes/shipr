@@ -15,6 +15,7 @@ func main() {
 		env         = flag.String("env", Env("GOENV", "development"), "The environment to run in.")
 		port        = flag.String("port", Env("PORT", "3001"), "Port to run the server on.")
 		githubToken = flag.String("github-token", Env("SHIPR_GITHUB_TOKEN", ""), "GitHub api token.")
+		herokuToken = flag.String("heroku-token", Env("SHIPR_HEROKU_TOKEN", ""), "Heroku api token.")
 	)
 	flag.Parse()
 
@@ -22,6 +23,7 @@ func main() {
 		DBDir:       *dbdir,
 		Env:         *env,
 		GitHubToken: *githubToken,
+		HerokuToken: *herokuToken,
 	})
 	if err != nil {
 		log.Fatal(err)

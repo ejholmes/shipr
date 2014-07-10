@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"net/url"
 
+	"code.google.com/p/goauth2/oauth"
+
 	"github.com/ejholmes/go-github/github"
+	"github.com/ejholmes/heroku-go/v3"
 )
 
 type Deployer interface {
@@ -13,6 +16,17 @@ type Deployer interface {
 
 type HerokuDeployer struct {
 	GitHub *github.Client
+	Heroku *heroku.Service
+}
+
+func NewHerokuDeployer(gh *github.Client, herokuToken string) *HerokuDeployer {
+	t := &oauth.Transport{
+		Token:     &oauth.Token{AccessToken: herokuToken},
+		Transport: heroku.DefaultTransport,
+	}
+
+	h := heroku.NewService(t.Client())
+	return &HerokuDeployer{gh, h}
 }
 
 func (h *HerokuDeployer) Deploy(d Deployable) error {
@@ -26,11 +40,23 @@ type HerokuDeploy struct {
 }
 
 func (d *HerokuDeploy) Run() error {
-	url, err := d.SourceBlob()
+	source, err := d.SourceBlob()
 	if err != nil {
 		return err
 	}
-	fmt.Println(url)
+
+	url := source.String()
+	version := d.Sha()
+	build, err := d.Heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
+		SourceBlob: struct {
+			URL     *string `json:"url,omitempty"`
+			Version *string `json:"version,omitempty"`
+		}{&url, &version},
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Println(build)
 	return nil
 }
 
@@ -47,4 +73,8 @@ func (d *HerokuDeploy) SourceBlob() (*url.URL, error) {
 		return nil, err
 	}
 	return url, nil
+}
+
+func (d *HerokuDeploy) App() string {
+	return d.RepoName().Repo()
 }

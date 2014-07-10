@@ -9,6 +9,7 @@ type Options struct {
 	Env         string
 	DBDir       string
 	GitHubToken string
+	HerokuToken string
 }
 
 type Shipr struct {
@@ -39,10 +40,12 @@ func New(options *Options) (*Shipr, error) {
 	// Setup a client for talking to GitHub.
 	gh := github.NewClient(t.Client())
 
+	deployer := NewHerokuDeployer(gh, options.HerokuToken)
+
 	return &Shipr{
 		Env:      options.Env,
 		DB:       db,
-		Deployer: &HerokuDeployer{gh},
+		Deployer: deployer,
 		GitHub:   gh,
 	}, nil
 }
