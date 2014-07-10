@@ -38,7 +38,7 @@ func New(options *Options) (*Shipr, error) {
 	h := heroku.NewClient(options.HerokuToken)
 
 	// Setup the Heroku deployer.
-	deployer := NewHerokuDeployer(g, h)
+	deployer := newHerokuDeployer(g, h)
 
 	return &Shipr{
 		Env:      options.Env,
