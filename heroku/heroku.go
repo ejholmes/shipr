@@ -7,12 +7,19 @@ import (
 
 // HerokuClient is an interface that defines the heroku client that we need.
 type Client interface {
-	BuildCreate(app, url, version string) (*Build, error)
+	BuildCreate(appId, url, version string) (*Build, error)
+	BuildOutputStream(appId, buildId string) chan *BuildResultLine
 }
 
 // Build wraps heroku.Build.
 type Build struct {
 	*heroku.Build
+}
+
+// BuildResultLine represnts a log line from the build result.
+type BuildResultLine struct {
+	Line   string
+	Stream string
 }
 
 // herokuClient is an implementation of the HerokuClient interface.
@@ -32,8 +39,8 @@ func NewClient(token string) Client {
 }
 
 // BuildCreate creates a build and returns it.
-func (c *client) BuildCreate(app, url, version string) (*Build, error) {
-	build, err := c.heroku.BuildCreate(app, heroku.BuildCreateOpts{
+func (c *client) BuildCreate(appId, url, version string) (*Build, error) {
+	build, err := c.heroku.BuildCreate(appId, heroku.BuildCreateOpts{
 		SourceBlob: struct {
 			URL     *string `json:"url,omitempty"`
 			Version *string `json:"version,omitempty"`
@@ -41,4 +48,10 @@ func (c *client) BuildCreate(app, url, version string) (*Build, error) {
 	})
 
 	return &Build{build}, err
+}
+
+// BuildOutputStream returns a channel that streams the build output.
+func (c *client) BuildOutputStream(appId, buildId string) chan *BuildResultLine {
+	ch := make(chan *BuildResultLine)
+	return ch
 }
