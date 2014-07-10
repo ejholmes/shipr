@@ -65,9 +65,7 @@ func (d *herokuDeploy) createBuild() (*heroku.Build, error) {
 // sourceBlob returns the archive link where the source can be downloaded by the heroku build.
 func (d *herokuDeploy) sourceBlob() (*url.URL, error) {
 	repoName := d.RepoName()
-
-	url, err := d.github.GetArchiveLink(repoName.Owner(), repoName.Repo(), d.Sha())
-	return url, err
+	return d.github.GetArchiveLink(repoName.Owner(), repoName.Repo(), d.Sha())
 }
 
 // app returns the name of the app.
