@@ -41,7 +41,7 @@ func (d *HerokuDeploy) SourceBlob() (*url.URL, error) {
 		repoName.Owner(),
 		repoName.Repo(),
 		github.Tarball,
-		&github.RepositoryContentGetOptions{Ref: d.Ref()},
+		&github.RepositoryContentGetOptions{Ref: d.Sha()},
 	)
 	if err != nil {
 		return nil, err
