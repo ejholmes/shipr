@@ -1,10 +1,23 @@
 {
 	"ImportPath": "github.com/remind101/shipr",
 	"GoVersion": "go1.3",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "bitbucket.org/liamstask/goose/lib/goose",
 			"Rev": "e885648f5ad6e48f7d7532b9c0b21767333d50ab"
+		},
+		{
+			"ImportPath": "code.google.com/p/go-uuid/uuid",
+			"Comment": "null-12",
+			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
+		},
+		{
+			"ImportPath": "code.google.com/p/goauth2/oauth",
+			"Comment": "weekly-48",
+			"Rev": "6a3615e294b534a1c24cb5d3d7570fa8bbc30c99"
 		},
 		{
 			"ImportPath": "github.com/codegangsta/negroni",
@@ -14,6 +27,18 @@
 			"ImportPath": "github.com/coopernurse/gorp",
 			"Comment": "v1.2.1",
 			"Rev": "32a45d9c74f42c1db41db5d4261760a613832a3d"
+		},
+		{
+			"ImportPath": "github.com/ejholmes/go-github/github",
+			"Rev": "da2847f95d2ffac63e02dc7e83b7412e5a18d4b4"
+		},
+		{
+			"ImportPath": "github.com/ejholmes/heroku-go/v3",
+			"Rev": "0dbef5a2aeb64aa859c1c7d65caf152eb81cc6bb"
+		},
+		{
+			"ImportPath": "github.com/google/go-querystring/query",
+			"Rev": "ec0a78e0f4db229b7897be36596a8944230b857a"
 		},
 		{
 			"ImportPath": "github.com/gorilla/context",
