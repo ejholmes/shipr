@@ -27,8 +27,8 @@ func newHerokuClient(token string) HerokuClient {
 }
 
 // BuildCreate creates a build and returns it.
-func (h *herokuClient) BuildCreate(app, url, version string) (*heroku.Build, error) {
-	return h.heroku.BuildCreate(app, heroku.BuildCreateOpts{
+func (c *herokuClient) BuildCreate(app, url, version string) (*heroku.Build, error) {
+	return c.heroku.BuildCreate(app, heroku.BuildCreateOpts{
 		SourceBlob: struct {
 			URL     *string `json:"url,omitempty"`
 			Version *string `json:"version,omitempty"`
