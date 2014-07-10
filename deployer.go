@@ -15,8 +15,8 @@ type Deployer interface {
 }
 
 type HerokuDeployer struct {
-	GitHub *github.Client
-	Heroku *heroku.Service
+	github *github.Client
+	heroku *heroku.Service
 }
 
 func NewHerokuDeployer(gh *github.Client, herokuToken string) *HerokuDeployer {
@@ -56,7 +56,7 @@ func (d *HerokuDeploy) CreateBuild() (*heroku.Build, error) {
 
 	url, version := source.String(), d.Sha()
 
-	return d.Heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
+	return d.heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
 		SourceBlob: struct {
 			URL     *string `json:"url,omitempty"`
 			Version *string `json:"version,omitempty"`
@@ -67,16 +67,13 @@ func (d *HerokuDeploy) CreateBuild() (*heroku.Build, error) {
 func (d *HerokuDeploy) SourceBlob() (*url.URL, error) {
 	repoName := d.RepoName()
 
-	url, _, err := d.GitHub.Repositories.GetArchiveLink(
+	url, _, err := d.github.Repositories.GetArchiveLink(
 		repoName.Owner(),
 		repoName.Repo(),
 		github.Tarball,
 		&github.RepositoryContentGetOptions{Ref: d.Sha()},
 	)
-	if err != nil {
-		return nil, err
-	}
-	return url, nil
+	return url, err
 }
 
 func (d *HerokuDeploy) App() string {
