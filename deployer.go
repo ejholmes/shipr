@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/remind101/shipr/github"
 	"github.com/remind101/shipr/heroku"
 )
 
@@ -12,11 +13,11 @@ type Deployer interface {
 }
 
 type HerokuDeployer struct {
-	github GitHubClient
+	github github.Client
 	heroku heroku.Client
 }
 
-func NewHerokuDeployer(g GitHubClient, h heroku.Client) *HerokuDeployer {
+func NewHerokuDeployer(g github.Client, h heroku.Client) *HerokuDeployer {
 	return &HerokuDeployer{g, h}
 }
 
