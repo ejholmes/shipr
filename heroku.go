@@ -5,15 +5,33 @@ import (
 	"github.com/ejholmes/heroku-go/v3"
 )
 
-type HerokuClient struct {
-	*heroku.Service
+// HerokuClient is an interface that defines the heroku client that we need.
+type HerokuClient interface {
+	BuildCreate(app, url, version string) (*heroku.Build, error)
 }
 
-func NewHerokuClient(token string) *HerokuClient {
+// herokuClient is an implementation of the HerokuClient interface.
+type herokuClient struct {
+	heroku *heroku.Service
+}
+
+// newHerokuClient returns a new HerokuClient that is configured to authenticate
+// with heroku via an oauth token.
+func newHerokuClient(token string) HerokuClient {
 	t := &oauth.Transport{
 		Token:     &oauth.Token{AccessToken: token},
 		Transport: heroku.DefaultTransport,
 	}
 
-	return &HerokuClient{heroku.NewService(t.Client())}
+	return &herokuClient{heroku.NewService(t.Client())}
+}
+
+// BuildCreate creates a build and returns it.
+func (h *herokuClient) BuildCreate(app, url, version string) (*heroku.Build, error) {
+	return h.heroku.BuildCreate(app, heroku.BuildCreateOpts{
+		SourceBlob: struct {
+			URL     *string `json:"url,omitempty"`
+			Version *string `json:"version,omitempty"`
+		}{&url, &version},
+	})
 }

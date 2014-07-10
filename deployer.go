@@ -14,11 +14,11 @@ type Deployer interface {
 
 type HerokuDeployer struct {
 	github *GitHubClient
-	heroku *HerokuClient
+	heroku HerokuClient
 }
 
 func NewHerokuDeployer(gh *GitHubClient, token string) *HerokuDeployer {
-	h := NewHerokuClient(token)
+	h := newHerokuClient(token)
 	return &HerokuDeployer{gh, h}
 }
 
@@ -47,14 +47,7 @@ func (d *HerokuDeploy) CreateBuild() (*heroku.Build, error) {
 		return nil, err
 	}
 
-	url, version := source.String(), d.Sha()
-
-	return d.heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
-		SourceBlob: struct {
-			URL     *string `json:"url,omitempty"`
-			Version *string `json:"version,omitempty"`
-		}{&url, &version},
-	})
+	return d.heroku.BuildCreate(d.App(), source.String(), d.Sha())
 }
 
 func (d *HerokuDeploy) SourceBlob() (*url.URL, error) {
