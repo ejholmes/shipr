@@ -40,24 +40,29 @@ type HerokuDeploy struct {
 }
 
 func (d *HerokuDeploy) Run() error {
-	source, err := d.SourceBlob()
-	if err != nil {
-		return err
-	}
-
-	url := source.String()
-	version := d.Sha()
-	build, err := d.Heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
-		SourceBlob: struct {
-			URL     *string `json:"url,omitempty"`
-			Version *string `json:"version,omitempty"`
-		}{&url, &version},
-	})
+	build, err := d.CreateBuild()
 	if err != nil {
 		return err
 	}
 	fmt.Println(build)
 	return nil
+}
+
+func (d *HerokuDeploy) CreateBuild() (*heroku.Build, error) {
+	source, err := d.SourceBlob()
+	if err != nil {
+		return nil, err
+	}
+
+	url := source.String()
+	version := d.Sha()
+
+	return d.Heroku.BuildCreate(d.App(), heroku.BuildCreateOpts{
+		SourceBlob: struct {
+			URL     *string `json:"url,omitempty"`
+			Version *string `json:"version,omitempty"`
+		}{&url, &version},
+	})
 }
 
 func (d *HerokuDeploy) SourceBlob() (*url.URL, error) {
