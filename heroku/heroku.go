@@ -11,7 +11,7 @@ import (
 // Client is an interface that defines the heroku client that we need.
 type Client interface {
 	BuildCreate(appId, url, version string) (*Build, error)
-	BuildOutputStream(appId, buildId string) (<-chan *BuildResultLine, <-chan string)
+	BuildOutputStream(appId, buildId string, lines chan *BuildResultLine, status chan string)
 }
 
 // Build wraps heroku.Build.
@@ -59,9 +59,9 @@ func (c *client) BuildCreate(appId, url, version string) (*Build, error) {
 }
 
 // BuildOutputStream returns a channel that streams the build output.
-func (c *client) BuildOutputStream(appId, buildId string) (<-chan *BuildResultLine, <-chan string) {
+func (c *client) BuildOutputStream(appId, buildId string, lch chan *BuildResultLine, sch chan string) {
 	idx, status := 0, ""
-	lch, sch, throttle := make(chan *BuildResultLine), make(chan string, 1), time.Tick(1*time.Second)
+	throttle := time.Tick(1 * time.Second)
 
 	go func() {
 		for {
@@ -84,8 +84,6 @@ func (c *client) BuildOutputStream(appId, buildId string) (<-chan *BuildResultLi
 			}
 		}
 	}()
-
-	return lch, sch
 }
 
 // newBuildResultLines returns log lines after the provided index.

@@ -44,12 +44,23 @@ func newHerokuDeploy(h *herokuDeployer, d Deployable) *herokuDeploy {
 
 // run runs the build process.
 func (d *herokuDeploy) run() error {
-	build, err := d.createBuild()
+	b, err := d.createBuild()
 	if err != nil {
 		return err
 	}
-	lines, status := d.heroku.BuildOutputStream(d.app(), build.ID)
 
+	d.poll(b)
+
+	fmt.Println("Done")
+	return nil
+}
+
+// polls polls the build output.
+func (d *herokuDeploy) poll(b *heroku.Build) {
+	lines := make(chan *heroku.BuildResultLine, 100)
+	status := make(chan string)
+
+	d.heroku.BuildOutputStream(d.app(), b.ID, lines, status)
 	for {
 		select {
 		case l := <-lines:
@@ -61,8 +72,6 @@ func (d *herokuDeploy) run() error {
 			}
 		}
 	}
-	fmt.Println("Done")
-	return nil
 }
 
 // createBuild creates the Heroku build.
