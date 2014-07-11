@@ -1,10 +1,11 @@
-package heroku
+package shipr
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/ejholmes/heroku-go/v3"
+	h "github.com/ejholmes/heroku-go/v3"
+	"github.com/remind101/shipr/heroku"
 )
 
 func Test_NewBuildResultLines(t *testing.T) {
@@ -14,7 +15,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 			Stream string `json:"stream"`
 		}
 		idx      int
-		expected []*BuildResultLine
+		expected []*herokuLogLine
 	}{
 		{
 			idx: 0,
@@ -24,7 +25,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 			}{
 				{Line: "Hello\n", Stream: "STDOUT"},
 			},
-			expected: []*BuildResultLine{
+			expected: []*herokuLogLine{
 				{Line: "Hello\n", Stream: "STDOUT"},
 			},
 		},
@@ -37,7 +38,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 				{Line: "Hello\n", Stream: "STDOUT"},
 				{Line: "World\n", Stream: "STDOUT"},
 			},
-			expected: []*BuildResultLine{
+			expected: []*herokuLogLine{
 				{Line: "Hello\n", Stream: "STDOUT"},
 				{Line: "World\n", Stream: "STDOUT"},
 			},
@@ -51,15 +52,15 @@ func Test_NewBuildResultLines(t *testing.T) {
 				{Line: "Hello\n", Stream: "STDOUT"},
 				{Line: "World\n", Stream: "STDOUT"},
 			},
-			expected: []*BuildResultLine{
+			expected: []*herokuLogLine{
 				{Line: "World\n", Stream: "STDOUT"},
 			},
 		},
 	}
 
 	for i, test := range tests {
-		b := &heroku.BuildResult{Lines: test.lines}
-		lines := newBuildResultLines(b, test.idx)
+		b := &heroku.BuildResult{&h.BuildResult{Lines: test.lines}}
+		lines := newLines(b, test.idx)
 
 		if !reflect.DeepEqual(lines, test.expected) {
 			t.Errorf("%v: Want %v; Got %v", i, test.expected, lines)

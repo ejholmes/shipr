@@ -2,7 +2,6 @@ package heroku
 
 import (
 	"net/http"
-	"time"
 
 	"code.google.com/p/goauth2/oauth"
 	"github.com/ejholmes/heroku-go/v3"
@@ -11,7 +10,7 @@ import (
 // Client is an interface that defines the heroku client that we need.
 type Client interface {
 	BuildCreate(appId, url, version string) (*Build, error)
-	BuildOutputStream(appId, buildId string, lines chan *BuildResultLine, status chan string)
+	BuildResultInfo(appId, buildId string) (*BuildResult, error)
 }
 
 // Build wraps heroku.Build.
@@ -19,10 +18,9 @@ type Build struct {
 	*heroku.Build
 }
 
-// BuildResultLine represnts a log line from the build result.
-type BuildResultLine struct {
-	Line   string
-	Stream string
+// BuildResult wraps heroku.BuildResult.
+type BuildResult struct {
+	*heroku.BuildResult
 }
 
 // client is an implementation of the HerokuClient interface.
@@ -48,50 +46,18 @@ func New(token string) Client {
 
 // BuildCreate creates a build and returns it.
 func (c *client) BuildCreate(appId, url, version string) (*Build, error) {
-	build, err := c.heroku.BuildCreate(appId, heroku.BuildCreateOpts{
+	b, err := c.heroku.BuildCreate(appId, heroku.BuildCreateOpts{
 		SourceBlob: struct {
 			URL     *string `json:"url,omitempty"`
 			Version *string `json:"version,omitempty"`
 		}{&url, &version},
 	})
 
-	return &Build{build}, err
+	return &Build{b}, err
 }
 
-// BuildOutputStream returns a channel that streams the build output.
-func (c *client) BuildOutputStream(appId, buildId string, lch chan *BuildResultLine, sch chan string) {
-	idx, status := 0, ""
-	throttle := time.Tick(1 * time.Second)
-
-	go func() {
-		for {
-			<-throttle
-
-			b, err := c.heroku.BuildResultInfo(appId, buildId)
-			if err != nil {
-				continue
-			}
-
-			lines := newBuildResultLines(b, idx)
-			for _, l := range lines {
-				lch <- l
-			}
-			idx += len(lines)
-
-			if b.Build.Status != status {
-				status = b.Build.Status
-				sch <- status
-			}
-		}
-	}()
-}
-
-// newBuildResultLines returns log lines after the provided index.
-func newBuildResultLines(b *heroku.BuildResult, idx int) []*BuildResultLine {
-	raw := b.Lines[idx:len(b.Lines)]
-	lines := make([]*BuildResultLine, len(raw))
-	for i, l := range raw {
-		lines[i] = &BuildResultLine{Line: l.Line, Stream: l.Stream}
-	}
-	return lines
+// BuildResultInfo gets info about a a Build.
+func (c *client) BuildResultInfo(appId, buildId string) (*BuildResult, error) {
+	b, err := c.heroku.BuildResultInfo(appId, buildId)
+	return &BuildResult{b}, err
 }

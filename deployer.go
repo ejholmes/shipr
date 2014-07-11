@@ -3,6 +3,7 @@ package shipr
 import (
 	"fmt"
 	"net/url"
+	"time"
 
 	"github.com/remind101/shipr/github"
 	"github.com/remind101/shipr/heroku"
@@ -57,19 +58,26 @@ func (d *herokuDeploy) run() error {
 
 // polls polls the build output.
 func (d *herokuDeploy) poll(b *heroku.Build) {
-	lines := make(chan *heroku.BuildResultLine, 100)
-	status := make(chan string)
+	idx := 0
+	throttle := time.Tick(1 * time.Second)
 
-	d.heroku.BuildOutputStream(d.app(), b.ID, lines, status)
 	for {
-		select {
-		case l := <-lines:
-			fmt.Println(l.Line)
-		case s := <-status:
-			fmt.Println(s)
-			if s == "succeeded" {
-				break
-			}
+		<-throttle
+
+		b, err := d.heroku.BuildResultInfo(d.app(), b.ID)
+		if err != nil {
+			continue
+		}
+
+		lines := newLines(b, idx)
+		for _, l := range lines {
+			d.AddLine(l.Line, time.Now())
+		}
+		idx += len(lines)
+
+		if b.Build.Status == "succeeded" || b.Build.Status == "failed" {
+			d.SetExitCode(int(b.ExitCode))
+			break
 		}
 	}
 }
@@ -93,4 +101,19 @@ func (d *herokuDeploy) sourceBlob() (*url.URL, error) {
 // app returns the name of the app.
 func (d *herokuDeploy) app() string {
 	return d.RepoName().Repo()
+}
+
+type herokuLogLine struct {
+	Line   string
+	Stream string
+}
+
+// newLines returns log lines after the provided index.
+func newLines(b *heroku.BuildResult, idx int) []*herokuLogLine {
+	raw := b.Lines[idx:len(b.Lines)]
+	lines := make([]*herokuLogLine, len(raw))
+	for i, l := range raw {
+		lines[i] = &herokuLogLine{Line: l.Line, Stream: l.Stream}
+	}
+	return lines
 }

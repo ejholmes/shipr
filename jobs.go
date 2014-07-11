@@ -1,6 +1,9 @@
 package shipr
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type JobStatus int
 
@@ -82,5 +85,11 @@ func (j *DeploymentJob) Environment() string { return j.Job.Environment }
 func (j *DeploymentJob) Description() string { return j.Job.Description }
 
 func (j *DeploymentJob) AddLine(output string, timestamp time.Time) error {
+	fmt.Println(output)
+	return nil
+}
+
+func (j *DeploymentJob) SetExitCode(code int) error {
+	fmt.Println(code)
 	return nil
 }

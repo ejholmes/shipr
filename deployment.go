@@ -28,4 +28,5 @@ type Deployable interface {
 	Deployment
 
 	AddLine(string, time.Time) error
+	SetExitCode(int) error
 }
