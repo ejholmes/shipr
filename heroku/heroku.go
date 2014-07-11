@@ -11,7 +11,7 @@ import (
 // Client is an interface that defines the heroku client that we need.
 type Client interface {
 	BuildCreate(appId, url, version string) (*Build, error)
-	BuildOutputStream(appId, buildId string) <-chan *BuildResultLine
+	BuildOutputStream(appId, buildId string) (<-chan *BuildResultLine, <-chan string)
 }
 
 // Build wraps heroku.Build.
@@ -59,28 +59,33 @@ func (c *client) BuildCreate(appId, url, version string) (*Build, error) {
 }
 
 // BuildOutputStream returns a channel that streams the build output.
-func (c *client) BuildOutputStream(appId, buildId string) <-chan *BuildResultLine {
-	idx, ch, ticker := 0, make(chan *BuildResultLine), time.Tick(1*time.Second)
+func (c *client) BuildOutputStream(appId, buildId string) (<-chan *BuildResultLine, <-chan string) {
+	idx, status := 0, ""
+	lch, sch, throttle := make(chan *BuildResultLine), make(chan string, 1), time.Tick(1*time.Second)
 
 	go func() {
 		for {
-			select {
-			case <-ticker:
-				b, err := c.heroku.BuildResultInfo(appId, buildId)
-				if err != nil {
-					continue
-				}
+			<-throttle
 
-				lines := newBuildResultLines(b, idx)
-				for _, l := range lines {
-					ch <- l
-				}
-				idx += len(lines)
+			b, err := c.heroku.BuildResultInfo(appId, buildId)
+			if err != nil {
+				continue
+			}
+
+			lines := newBuildResultLines(b, idx)
+			for _, l := range lines {
+				lch <- l
+			}
+			idx += len(lines)
+
+			if b.Build.Status != status {
+				status = b.Build.Status
+				sch <- status
 			}
 		}
 	}()
 
-	return ch
+	return lch, sch
 }
 
 // newBuildResultLines returns log lines after the provided index.

@@ -58,10 +58,7 @@ func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var d github.Deployment
 	decodeRequest(r, &d)
 
-	err := h.Deploy(&GitHubDeployment{&d})
-	if err != nil {
-		panic(err)
-	}
+	go h.Deploy(&GitHubDeployment{&d})
 }
 
 type DeploymentStatusHandler struct {

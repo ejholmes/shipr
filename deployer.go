@@ -48,7 +48,20 @@ func (d *herokuDeploy) run() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(build)
+	lines, status := d.heroku.BuildOutputStream(d.app(), build.ID)
+
+	for {
+		select {
+		case l := <-lines:
+			fmt.Println(l.Line)
+		case s := <-status:
+			fmt.Println(s)
+			if s == "succeeded" {
+				break
+			}
+		}
+	}
+	fmt.Println("Done")
 	return nil
 }
 
