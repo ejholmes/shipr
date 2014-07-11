@@ -62,20 +62,33 @@ func (c *client) BuildCreate(appId, url, version string) (*Build, error) {
 func (c *client) BuildOutputStream(appId, buildId string) <-chan *BuildResultLine {
 	idx, ch, ticker := 0, make(chan *BuildResultLine), time.Tick(1*time.Second)
 
-	for {
-		select {
-		case <-ticker:
-			b, err := c.heroku.BuildResultInfo(appId, buildId)
-			if err != nil {
-				break
+	go func() {
+		for {
+			select {
+			case <-ticker:
+				b, err := c.heroku.BuildResultInfo(appId, buildId)
+				if err != nil {
+					continue
+				}
+
+				lines := newBuildResultLines(b, idx)
+				for _, l := range lines {
+					ch <- l
+				}
+				idx += len(lines)
 			}
-			lines := b.Lines[idx:len(b.Lines)]
-			for _, l := range lines {
-				ch <- &BuildResultLine{Line: l.Line, Stream: l.Stream}
-			}
-			idx = len(b.Lines)
 		}
-	}
+	}()
 
 	return ch
+}
+
+// newBuildResultLines returns log lines after the provided index.
+func newBuildResultLines(b *heroku.BuildResult, idx int) []*BuildResultLine {
+	raw := b.Lines[idx:len(b.Lines)]
+	lines := make([]*BuildResultLine, len(raw))
+	for i, l := range raw {
+		lines[i] = &BuildResultLine{Line: l.Line, Stream: l.Stream}
+	}
+	return lines
 }
