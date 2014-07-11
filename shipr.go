@@ -19,8 +19,8 @@ type Shipr struct {
 	// The DB connection.
 	*DB
 
-	// The deployer we'll use to deploy jobs.
-	Deployer
+	// The Provider we'll use to deploy jobs.
+	Provider
 
 	// Clients.
 	GitHub github.Client
@@ -38,12 +38,12 @@ func New(options *Options) (*Shipr, error) {
 	h := heroku.New(options.HerokuToken)
 
 	// Setup the Heroku deployer.
-	deployer := newHerokuDeployer(g, h)
+	provider := newHerokuProvider(g, h)
 
 	return &Shipr{
 		Env:      options.Env,
 		DB:       db,
-		Deployer: deployer,
+		Provider: provider,
 		GitHub:   g,
 	}, nil
 }
@@ -55,7 +55,7 @@ func (c *Shipr) Deploy(d Deployment) error {
 	if err != nil {
 		return err
 	}
-	return c.Deployer.Deploy(&DeploymentJob{j})
+	return c.Provider.Deploy(&DeploymentJob{j})
 }
 
 func (c *Shipr) Close() error {

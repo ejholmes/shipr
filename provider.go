@@ -9,37 +9,37 @@ import (
 	"github.com/remind101/shipr/heroku"
 )
 
-// Deployer is an interface that can be implemented for deploying a Deployable to
+// Provider is an interface that can be implemented for deploying a Deployable to
 // some platform.
-type Deployer interface {
+type Provider interface {
 	Deploy(Deployable) error
 }
 
-// herokuDeployer is an implementation of the Deployer interface for deploying
+// herokuProvider is an implementation of the Provider interface for deploying
 // to Heroku using the Platform API: https://devcenter.heroku.com/articles/platform-api-reference#build
-type herokuDeployer struct {
+type herokuProvider struct {
 	github github.Client
 	heroku heroku.Client
 }
 
-// newHerokuDeployer builds a new herokuDeployer and returns it.
-func newHerokuDeployer(g github.Client, h heroku.Client) Deployer {
-	return &herokuDeployer{g, h}
+// newHerokuProvider builds a new herokuProvider and returns it.
+func newHerokuProvider(g github.Client, h heroku.Client) Provider {
+	return &herokuProvider{g, h}
 }
 
-// Deployer implements the Deployer interface. Builds a new herokuDeploy and runs it.
-func (h *herokuDeployer) Deploy(d Deployable) error {
+// Provider implements the Provider interface. Builds a new herokuDeploy and runs it.
+func (h *herokuProvider) Deploy(d Deployable) error {
 	return newHerokuDeploy(h, d).run()
 }
 
 // herokuDeploy wraps a deployable for managing the Heroku build process.
 type herokuDeploy struct {
-	*herokuDeployer
+	*herokuProvider
 	Deployable
 }
 
 // newHerokuDeploy builds a new herokuDeploy and returns it.
-func newHerokuDeploy(h *herokuDeployer, d Deployable) *herokuDeploy {
+func newHerokuDeploy(h *herokuProvider, d Deployable) *herokuDeploy {
 	return &herokuDeploy{h, d}
 }
 
