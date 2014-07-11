@@ -1,6 +1,7 @@
 package github
 
 import (
+	"net/http"
 	"net/url"
 
 	"code.google.com/p/goauth2/oauth"
@@ -18,15 +19,19 @@ type client struct {
 	github *github.Client
 }
 
-// NewClient reeturns a Client that is configured to authenticate
+// New returns a Client that is configured to authenticate
 // via an oauth token.
-func NewClient(token string) Client {
+func New(token string) Client {
 	t := &oauth.Transport{
 		Token: &oauth.Token{AccessToken: token},
 	}
 
-	// Setup a client for talking to GitHub.
-	return &client{github.NewClient(t.Client())}
+	return NewClient(t.Client())
+}
+
+// NewClient returns a Client.
+func NewClient(c *http.Client) Client {
+	return &client{github.NewClient(c)}
 }
 
 // GetArchiveLink returns the url to download a tarball archive of the source for the specified ref

@@ -34,8 +34,8 @@ func New(options *Options) (*Shipr, error) {
 	}
 
 	// Setup a client for talking to GitHub and Heroku.
-	g := github.NewClient(options.GitHubToken)
-	h := heroku.NewClient(options.HerokuToken)
+	g := github.New(options.GitHubToken)
+	h := heroku.New(options.HerokuToken)
 
 	// Setup the Heroku deployer.
 	deployer := newHerokuDeployer(g, h)
