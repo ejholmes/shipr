@@ -34,19 +34,19 @@ func NewGitHubHandler(c *shipr.Shipr) *GitHubHandler {
 	return h
 }
 
-// GitHubDeployment wraps a github.Deployment to implement the shipr.Deployment interface.
-type GitHubDeployment struct {
+// deployment wraps a github.Deployment to implement the shipr.Deployment interface.
+type deployment struct {
 	*github.Deployment
 }
 
-func (d *GitHubDeployment) Guid() int { return *d.Deployment.ID }
-func (d *GitHubDeployment) RepoName() shipr.RepoName {
+func (d *deployment) Guid() int { return *d.Deployment.ID }
+func (d *deployment) RepoName() shipr.RepoName {
 	return shipr.RepoName(util.SafeString(d.Deployment.Repository.FullName))
 }
-func (d *GitHubDeployment) Sha() string         { return util.SafeString(d.Deployment.Sha) }
-func (d *GitHubDeployment) Ref() string         { return util.SafeString(d.Deployment.Ref) }
-func (d *GitHubDeployment) Environment() string { return util.SafeString(d.Deployment.Environment) }
-func (d *GitHubDeployment) Description() string {
+func (d *deployment) Sha() string         { return util.SafeString(d.Deployment.Sha) }
+func (d *deployment) Ref() string         { return util.SafeString(d.Deployment.Ref) }
+func (d *deployment) Environment() string { return util.SafeString(d.Deployment.Environment) }
+func (d *deployment) Description() string {
 	return util.SafeString(d.Deployment.Description)
 }
 
@@ -58,7 +58,7 @@ func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var d github.Deployment
 	decodeRequest(r, &d)
 
-	go h.Deploy(&GitHubDeployment{&d})
+	h.Deploy(&deployment{&d})
 }
 
 type DeploymentStatusHandler struct {

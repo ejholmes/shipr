@@ -1,7 +1,6 @@
 package shipr
 
 import (
-	"fmt"
 	"net/url"
 	"time"
 
@@ -50,9 +49,8 @@ func (d *herokuDeploy) run() error {
 		return err
 	}
 
-	d.poll(b)
+	go d.poll(b)
 
-	fmt.Println("Done")
 	return nil
 }
 
