@@ -49,9 +49,9 @@ func New(options *Options) (*Shipr, error) {
 }
 
 // Deploy is the primary interface into deploying things. It takes an object that conforms
-// to the Deployment interface, creates a Job then runs it.
-func (c *Shipr) Deploy(d Deployment) error {
-	j, err := c.Jobs.CreateFromDeployment(d)
+// to the Description interface, creates a Job then runs it.
+func (c *Shipr) Deploy(d Description) error {
+	j, err := c.Jobs.CreateFromDescription(d)
 	if err != nil {
 		return err
 	}

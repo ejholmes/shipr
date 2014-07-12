@@ -8,10 +8,10 @@ import (
 	"github.com/remind101/shipr/heroku"
 )
 
-// Provider is an interface that can be implemented for deploying a Deployable to
+// Provider is an interface that can be implemented for deploying a Deployment to
 // some platform.
 type Provider interface {
-	Deploy(Deployable) error
+	Deploy(Deployment) error
 }
 
 // herokuProvider is an implementation of the Provider interface for deploying
@@ -27,18 +27,18 @@ func newHerokuProvider(g github.Client, h heroku.Client) Provider {
 }
 
 // Provider implements the Provider interface. Builds a new herokuDeploy and runs it.
-func (h *herokuProvider) Deploy(d Deployable) error {
+func (h *herokuProvider) Deploy(d Deployment) error {
 	return newHerokuDeploy(h, d).run()
 }
 
 // herokuDeploy wraps a deployable for managing the Heroku build process.
 type herokuDeploy struct {
 	*herokuProvider
-	Deployable
+	Deployment
 }
 
 // newHerokuDeploy builds a new herokuDeploy and returns it.
-func newHerokuDeploy(h *herokuProvider, d Deployable) *herokuDeploy {
+func newHerokuDeploy(h *herokuProvider, d Deployment) *herokuDeploy {
 	return &herokuDeploy{h, d}
 }
 

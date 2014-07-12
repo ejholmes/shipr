@@ -1,10 +1,5 @@
 package shipr
 
-import (
-	"fmt"
-	"time"
-)
-
 type JobStatus int
 
 const (
@@ -18,7 +13,7 @@ type JobsService struct {
 	*DB
 }
 
-func (s *JobsService) CreateFromDeployment(d Deployment) (*Job, error) {
+func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
 	repo, err := s.Repos.FindOrCreateByName(string(d.RepoName()))
 	if err != nil {
 		return nil, err
@@ -70,27 +65,4 @@ func (j *Job) IsDone() bool {
 	} else {
 		return false
 	}
-}
-
-// deployment is an implementation of the Deployment interface backed by the
-// jobs table.
-type deployment struct {
-	*Job
-}
-
-func (j *deployment) Guid() int           { return j.Job.Guid }
-func (j *deployment) RepoName() RepoName  { return j.Repo.RepoName() }
-func (j *deployment) Sha() string         { return j.Job.Sha }
-func (j *deployment) Ref() string         { return j.Job.Ref }
-func (j *deployment) Environment() string { return j.Job.Environment }
-func (j *deployment) Description() string { return j.Job.Description }
-
-func (j *deployment) AddLine(output string, timestamp time.Time) error {
-	fmt.Println(output)
-	return nil
-}
-
-func (j *deployment) SetExitCode(code int) error {
-	fmt.Println(code)
-	return nil
 }

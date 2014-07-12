@@ -1,10 +1,13 @@
 package shipr
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
-// Deployment is an interface that's describes information about a deployment.
+// Description is an interface that's describes information about a deployment.
 // This can be used to create jobs, and is also implemented by Job.
-type Deployment interface {
+type Description interface {
 	// Guid should return a unique identifier for this deployment.
 	Guid() int
 
@@ -24,9 +27,32 @@ type Deployment interface {
 	Description() string
 }
 
-type Deployable interface {
-	Deployment
+type Deployment interface {
+	Description
 
 	AddLine(string, time.Time) error
 	SetExitCode(int) error
+}
+
+// deployment is an implementation of the Deployment interface backed by the
+// jobs table.
+type deployment struct {
+	*Job
+}
+
+func (j *deployment) Guid() int           { return j.Job.Guid }
+func (j *deployment) RepoName() RepoName  { return j.Repo.RepoName() }
+func (j *deployment) Sha() string         { return j.Job.Sha }
+func (j *deployment) Ref() string         { return j.Job.Ref }
+func (j *deployment) Environment() string { return j.Job.Environment }
+func (j *deployment) Description() string { return j.Job.Description }
+
+func (j *deployment) AddLine(output string, timestamp time.Time) error {
+	fmt.Println(output)
+	return nil
+}
+
+func (j *deployment) SetExitCode(code int) error {
+	fmt.Println(code)
+	return nil
 }
