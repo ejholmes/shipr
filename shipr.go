@@ -55,7 +55,7 @@ func (c *Shipr) Deploy(d Deployment) error {
 	if err != nil {
 		return err
 	}
-	return c.Provider.Deploy(&DeploymentJob{j})
+	return c.Provider.Deploy(&deployment{j})
 }
 
 func (c *Shipr) Close() error {
