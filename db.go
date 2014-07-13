@@ -19,8 +19,9 @@ type DB struct {
 	*gorp.DbMap
 
 	// Services
-	Repos *ReposService
-	Jobs  *JobsService
+	Repos    *ReposService
+	Jobs     *JobsService
+	LogLines *LogLinesService
 }
 
 func NewDB(path, env string) (*DB, error) {
@@ -37,10 +38,12 @@ func NewDB(path, env string) (*DB, error) {
 	dbmap := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 	dbmap.AddTableWithName(Repo{}, "repos").SetKeys(true, "ID")
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
+	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
 
 	d := &DB{DBConf: dbconf, DB: db, DbMap: dbmap}
 	d.Repos = &ReposService{d}
 	d.Jobs = &JobsService{d}
+	d.LogLines = &LogLinesService{d}
 	return d, nil
 }
 

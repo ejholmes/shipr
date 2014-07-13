@@ -1,9 +1,6 @@
 package shipr
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
 // Description is an interface that's describes information about a deployment.
 // This can be used to create jobs, and is also implemented by Job.
@@ -49,8 +46,8 @@ func (d *deployment) Environment() string { return d.Job.Environment }
 func (d *deployment) Description() string { return d.Job.Description }
 
 func (d *deployment) AddLine(output string, timestamp time.Time) error {
-	fmt.Println(output)
-	return nil
+	_, err := d.DB.LogLines.CreateLine(d.Job, output, timestamp)
+	return err
 }
 
 func (d *deployment) SetExitCode(code int) error {

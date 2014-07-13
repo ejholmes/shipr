@@ -24,6 +24,7 @@ func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
 		RepoID:      repo.ID,
 		Guid:        d.Guid(),
 		Sha:         d.Sha(),
+		Ref:         d.Ref(),
 		Environment: d.Environment(),
 		Description: d.Description(),
 	}
