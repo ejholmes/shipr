@@ -37,22 +37,24 @@ type Deployment interface {
 // deployment is an implementation of the Deployment interface backed by the
 // jobs table.
 type deployment struct {
+	DB *DB
 	*Job
 }
 
-func (j *deployment) Guid() int           { return j.Job.Guid }
-func (j *deployment) RepoName() RepoName  { return j.Repo.RepoName() }
-func (j *deployment) Sha() string         { return j.Job.Sha }
-func (j *deployment) Ref() string         { return j.Job.Ref }
-func (j *deployment) Environment() string { return j.Job.Environment }
-func (j *deployment) Description() string { return j.Job.Description }
+func (d *deployment) Guid() int           { return d.Job.Guid }
+func (d *deployment) RepoName() RepoName  { return d.Job.Repo.RepoName() }
+func (d *deployment) Sha() string         { return d.Job.Sha }
+func (d *deployment) Ref() string         { return d.Job.Ref }
+func (d *deployment) Environment() string { return d.Job.Environment }
+func (d *deployment) Description() string { return d.Job.Description }
 
-func (j *deployment) AddLine(output string, timestamp time.Time) error {
+func (d *deployment) AddLine(output string, timestamp time.Time) error {
 	fmt.Println(output)
 	return nil
 }
 
-func (j *deployment) SetExitCode(code int) error {
-	fmt.Println(code)
+func (d *deployment) SetExitCode(code int) error {
+	d.Job.ExitStatus = &code
+	d.DB.Jobs.Update(d.Job)
 	return nil
 }
