@@ -1,6 +1,7 @@
-package server
+package github
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/ejholmes/go-github/github"
@@ -18,7 +19,7 @@ type GitHubHandler struct {
 	http.Handler
 }
 
-func NewGitHubHandler(c *shipr.Shipr) *GitHubHandler {
+func New(c *shipr.Shipr) *GitHubHandler {
 	m := mux.NewRouter()
 	h := &GitHubHandler{m}
 
@@ -79,4 +80,11 @@ type DeploymentStatusHandler struct {
 }
 
 func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+}
+
+func decodeRequest(r *http.Request, v interface{}) {
+	err := json.NewDecoder(r.Body).Decode(v)
+	if err != nil {
+		panic(err)
+	}
 }

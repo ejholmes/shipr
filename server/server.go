@@ -1,13 +1,16 @@
 package server
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
+	"github.com/remind101/shipr/server/api"
+	"github.com/remind101/shipr/server/github"
 )
+
+const apiContentType = "application/vnd.shipr+json; version=1"
 
 type Server struct {
 	*shipr.Shipr
@@ -17,8 +20,16 @@ type Server struct {
 func NewServer(c *shipr.Shipr) *Server {
 	m := mux.NewRouter()
 
+	// Health checking.
+	m.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok\n"))
+	}))
+
 	// GitHub webhooks.
-	m.Handle("/github", NewGitHubHandler(c))
+	m.Handle("/github", github.New(c))
+
+	// API
+	m.Headers("Accept", apiContentType).Handler(api.New(c))
 
 	// Middleware.
 	n := negroni.New()
@@ -26,11 +37,4 @@ func NewServer(c *shipr.Shipr) *Server {
 	n.UseHandler(m)
 
 	return &Server{c, n}
-}
-
-func decodeRequest(r *http.Request, v interface{}) {
-	err := json.NewDecoder(r.Body).Decode(v)
-	if err != nil {
-		panic(err)
-	}
 }
