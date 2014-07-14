@@ -42,7 +42,8 @@ func (s *ReposService) Find(id int) (*Repo, error) {
 func (s *ReposService) findBy(field string, v interface{}) (*Repo, error) {
 	var repo Repo
 
-	err := s.SelectOne(&repo, `SELECT * FROM repos WHERE `+field+` = $1 LIMIT 1`, v)
+	sql := `SELECT * FROM repos WHERE ` + field + ` = $1 LIMIT 1`
+	err := s.SelectOne(&repo, sql, v)
 	if err != nil {
 		return nil, err
 	}
