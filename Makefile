@@ -15,7 +15,7 @@ up:
 	goose -env test up
 
 build:
-	godep go build -o build/server github.com/remind101/shipr/server
+	godep go build -o build/shipr github.com/remind101/shipr/server/shipr
 
 run: build
-	build/server
+	build/shipr
