@@ -1,11 +1,8 @@
 package api
 
 import (
-	"encoding/json"
-	"net/http"
 	"strconv"
 
-	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
 )
 
@@ -31,21 +28,18 @@ func NewJob(j *shipr.Job) *Job {
 	}
 }
 
-type JobsHandler struct {
-	*shipr.Shipr
+func JobsList(c *shipr.Shipr, w ResponseWriter, r *Request) {
 }
 
-func (h *JobsHandler) Info(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
+func JobsInfo(c *shipr.Shipr, w ResponseWriter, r *Request) {
+	id, err := strconv.Atoi(r.Var("id"))
+	if err != nil {
+		panic(err)
+	}
+	job, err := c.Jobs.Find(id)
 	if err != nil {
 		panic(err)
 	}
 
-	job, err := h.Jobs.Find(id)
-	if err != nil {
-		panic(err)
-	}
-
-	json.NewEncoder(w).Encode(NewJob(job))
+	w.Present(200, NewJob(job))
 }
