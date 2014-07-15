@@ -19,16 +19,16 @@ func New(c *shipr.Shipr) http.Handler {
 	a := &API{c, mux.NewRouter()}
 
 	// Routes
-	a.Handle("/jobs", JobsList)
-	a.Handle("/jobs/{id}", JobsInfo)
+	a.Handle("GET", "/jobs", JobsList)
+	a.Handle("GET", "/jobs/{id}", JobsInfo)
 
 	return a
 }
 
 // Handle takes a path and a Handler func to handle requests to path.
-func (a *API) Handle(path string, hd Handler) {
-	h := &handler{a.Shipr, hd}
-	a.router.Handle(path, h)
+func (a *API) Handle(method, path string, hd Handler) {
+	h := &handler{a.Shipr, hd, method}
+	a.router.Handle(path, h).Methods(method)
 }
 
 // ServeHTTP implements the http.Handler interface.
@@ -96,6 +96,7 @@ func (r *Request) Var(v string) string {
 type handler struct {
 	*shipr.Shipr
 	Handle Handler
+	Method string
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
