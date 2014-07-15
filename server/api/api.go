@@ -87,14 +87,14 @@ func (r *Request) Var(v string) string {
 // handler wraps a Handler to return a proper JSON response.
 type handler struct {
 	*shipr.Shipr
-	Handle Handler
-	Method string
+	handle Handler
+	method string
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	res := &Response{}
 	req := &Request{Request: r, Vars: mux.Vars(r)}
-	h.Handle(h.Shipr, res, req)
+	h.handle(h.Shipr, res, req)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(res.status)
