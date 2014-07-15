@@ -41,5 +41,11 @@ func JobsInfo(c *shipr.Shipr, w ResponseWriter, r *Request) {
 		panic(err)
 	}
 
-	w.Present(200, NewJob(job))
+	if job == nil {
+		w.NotFound()
+		return
+	}
+
+	w.Status(200)
+	w.Present(NewJob(job))
 }

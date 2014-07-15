@@ -49,34 +49,42 @@ type Request struct {
 // ResponseWriter wraps an http.ResponseWriter.
 type ResponseWriter interface {
 	Status(int)
-	Present(int, interface{})
+	Present(interface{})
 	Error(int, string)
+	NotFound()
 }
 
 type responseWriter struct {
 	http.ResponseWriter
+	resource interface{}
+	status   int
 }
 
 // Status sets the status code.
 func (w *responseWriter) Status(code int) {
-	w.WriteHeader(code)
+	w.status = code
 }
 
 // Present presents the interface in JSON format.
-func (w *responseWriter) Present(code int, v interface{}) {
-	w.Status(code)
-	json.NewEncoder(w).Encode(v)
+func (w *responseWriter) Present(v interface{}) {
+	w.resource = v
 }
 
 // Error takes a string error message and presents it.
 func (w *responseWriter) Error(code int, msg string) {
-	err := &ErrorResponse{Message: msg}
-	w.Present(code, err)
+	v := &ErrorResponse{Error: msg}
+	w.Status(code)
+	w.Present(v)
+}
+
+// NotFound returns a standard 404 Not Found response.
+func (w *responseWriter) NotFound() {
+	w.Error(404, "Not Found")
 }
 
 // ErrorResponse is the format we respond with when there's an error.
 type ErrorResponse struct {
-	Message string
+	Error string `json:"error"`
 }
 
 // Var returns a single URL param.
@@ -91,6 +99,10 @@ type handler struct {
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	resp := &responseWriter{w}
-	h.Handle(h.Shipr, resp, &Request{Request: r, Vars: mux.Vars(r)})
+	rw := &responseWriter{ResponseWriter: w}
+	h.Handle(h.Shipr, rw, &Request{Request: r, Vars: mux.Vars(r)})
+
+	rw.Header().Set("Content-Type", "application/json")
+	rw.WriteHeader(rw.status)
+	json.NewEncoder(rw).Encode(rw.resource)
 }
