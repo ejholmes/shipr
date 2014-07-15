@@ -42,8 +42,7 @@ type Handler func(*shipr.Shipr, *Response, *Request)
 
 // Request wraps http.Request.
 type Request struct {
-	*http.Request
-	Vars map[string]string
+	vars map[string]string
 }
 
 // Response is an object for building a response.
@@ -81,7 +80,7 @@ type ErrorResponse struct {
 
 // Var returns a single URL param.
 func (r *Request) Var(v string) string {
-	return r.Vars[v]
+	return r.vars[v]
 }
 
 // handler wraps a Handler to return a proper JSON response.
@@ -93,7 +92,7 @@ type handler struct {
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	res := &Response{}
-	req := &Request{Request: r, Vars: mux.Vars(r)}
+	req := &Request{vars: mux.Vars(r)}
 	h.handle(h.Shipr, res, req)
 
 	w.Header().Set("Content-Type", "application/json")
