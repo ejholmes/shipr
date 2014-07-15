@@ -16,8 +16,9 @@ type Shipr struct {
 	// The environment (e.g. production, staging, etc..)
 	Env string
 
-	// The DB connection.
-	*DB
+	// Access to services.
+	db DB
+	*Datastore
 
 	// The Provider we'll use to deploy jobs.
 	Provider
@@ -41,10 +42,11 @@ func New(options *Options) (*Shipr, error) {
 	provider := newHerokuProvider(g, h)
 
 	return &Shipr{
-		Env:      options.Env,
-		DB:       db,
-		Provider: provider,
-		GitHub:   g,
+		Env:       options.Env,
+		db:        db,
+		Datastore: NewDatastore(db),
+		Provider:  provider,
+		GitHub:    g,
 	}, nil
 }
 
@@ -55,9 +57,9 @@ func (c *Shipr) Deploy(d Description) error {
 	if err != nil {
 		return err
 	}
-	return c.Provider.Deploy(&deployment{c.DB, j})
+	return c.Provider.Deploy(&deployment{c.Datastore, j})
 }
 
 func (c *Shipr) Close() error {
-	return c.DB.Close()
+	return c.db.Close()
 }

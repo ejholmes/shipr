@@ -4,7 +4,7 @@ import "strings"
 
 // ReposService manages the `repos` table.
 type ReposService struct {
-	*DB
+	*Datastore
 }
 
 // FindOrCreateByName tries to find the repo by name or it creates it.

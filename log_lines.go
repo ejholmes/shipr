@@ -4,7 +4,7 @@ import "time"
 
 // LogLinesService manages the `log_lines` table.
 type LogLinesService struct {
-	*DB
+	*Datastore
 }
 
 func (c *LogLinesService) CreateLine(job *Job, output string, timestamp time.Time) (*LogLine, error) {

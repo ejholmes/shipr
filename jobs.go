@@ -10,7 +10,7 @@ const (
 
 // JobsService manages the `jobs` table.
 type JobsService struct {
-	*DB
+	*Datastore
 }
 
 func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
