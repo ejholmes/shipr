@@ -10,8 +10,9 @@ import (
 
 // DB is an interface that allows us to CRUD records.
 type DB interface {
-	Insert(list ...interface{}) error
-	Update(list ...interface{}) (int64, error)
+	Insert(v interface{}) error
+	Update(v interface{}) error
+	//Get(holder interface{}, field string, value interface{}) error
 	SelectOne(holder interface{}, query string, args ...interface{}) error
 	Close() error
 }
@@ -25,7 +26,7 @@ type db struct {
 	DB *sql.DB
 
 	// The gorp dbmap. Also mixin methods.
-	*gorp.DbMap
+	Map *gorp.DbMap
 }
 
 func NewDB(path, env string) (DB, error) {
@@ -44,7 +45,20 @@ func NewDB(path, env string) (DB, error) {
 	dbmap.AddTableWithName(Job{}, "jobs").SetKeys(true, "ID")
 	dbmap.AddTableWithName(LogLine{}, "log_lines").SetKeys(true, "ID")
 
-	return &db{DBConf: dbconf, DB: conn, DbMap: dbmap}, nil
+	return &db{DBConf: dbconf, DB: conn, Map: dbmap}, nil
+}
+
+func (d *db) Insert(v interface{}) error {
+	return d.Map.Insert(v)
+}
+
+func (d *db) Update(v interface{}) error {
+	_, err := d.Map.Update(v)
+	return err
+}
+
+func (d *db) SelectOne(holder interface{}, query string, args ...interface{}) error {
+	return d.Map.SelectOne(holder, query, args...)
 }
 
 func (d *db) Close() error {
