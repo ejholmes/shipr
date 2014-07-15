@@ -28,11 +28,11 @@ func NewJob(j *shipr.Job) *Job {
 	}
 }
 
-func JobsList(c *shipr.Shipr, w ResponseWriter, r *Request) {
+func JobsList(c *shipr.Shipr, res *Response, req *Request) {
 }
 
-func JobsInfo(c *shipr.Shipr, w ResponseWriter, r *Request) {
-	id, err := strconv.Atoi(r.Var("id"))
+func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
+	id, err := strconv.Atoi(req.Var("id"))
 	if err != nil {
 		panic(err)
 	}
@@ -42,10 +42,10 @@ func JobsInfo(c *shipr.Shipr, w ResponseWriter, r *Request) {
 	}
 
 	if job == nil {
-		w.NotFound()
+		res.NotFound()
 		return
 	}
 
-	w.Status(200)
-	w.Present(NewJob(job))
+	res.Status(200)
+	res.Present(NewJob(job))
 }

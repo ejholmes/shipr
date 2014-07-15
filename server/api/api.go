@@ -38,7 +38,7 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Handler is a function signature that can handle a request and return a status code,
 // and a response object.
-type Handler func(*shipr.Shipr, ResponseWriter, *Request)
+type Handler func(*shipr.Shipr, *Response, *Request)
 
 // Request wraps http.Request.
 type Request struct {
@@ -46,39 +46,31 @@ type Request struct {
 	Vars map[string]string
 }
 
-// ResponseWriter wraps an http.ResponseWriter.
-type ResponseWriter interface {
-	Status(int)
-	Present(interface{})
-	Error(int, string)
-	NotFound()
-}
-
-type responseWriter struct {
-	http.ResponseWriter
+// Response is an object for building a response.
+type Response struct {
 	resource interface{}
 	status   int
 }
 
 // Status sets the status code.
-func (w *responseWriter) Status(code int) {
+func (w *Response) Status(code int) {
 	w.status = code
 }
 
 // Present presents the interface in JSON format.
-func (w *responseWriter) Present(v interface{}) {
-	w.resource = v
+func (w *Response) Present(resource interface{}) {
+	w.resource = resource
 }
 
 // Error takes a string error message and presents it.
-func (w *responseWriter) Error(code int, msg string) {
-	v := &ErrorResponse{Error: msg}
+func (w *Response) Error(code int, msg string) {
+	res := &ErrorResponse{Error: msg}
 	w.Status(code)
-	w.Present(v)
+	w.Present(res)
 }
 
 // NotFound returns a standard 404 Not Found response.
-func (w *responseWriter) NotFound() {
+func (w *Response) NotFound() {
 	w.Error(404, "Not Found")
 }
 
@@ -100,10 +92,11 @@ type handler struct {
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	rw := &responseWriter{ResponseWriter: w}
-	h.Handle(h.Shipr, rw, &Request{Request: r, Vars: mux.Vars(r)})
+	res := &Response{}
+	req := &Request{Request: r, Vars: mux.Vars(r)}
+	h.Handle(h.Shipr, res, req)
 
-	rw.Header().Set("Content-Type", "application/json")
-	rw.WriteHeader(rw.status)
-	json.NewEncoder(rw).Encode(rw.resource)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(res.status)
+	json.NewEncoder(w).Encode(res.resource)
 }
