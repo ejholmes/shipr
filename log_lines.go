@@ -27,3 +27,7 @@ type LogLine struct {
 	// Memoized Job.
 	Job *Job `db:"-"`
 }
+
+func (l *LogLine) table() string {
+	return "log_lines"
+}

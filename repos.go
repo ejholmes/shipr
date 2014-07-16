@@ -42,7 +42,7 @@ func (s *ReposService) Find(id int) (*Repo, error) {
 func (s *ReposService) findBy(field string, v interface{}) (*Repo, error) {
 	var repo Repo
 
-	err := s.Get(&repo, "repos", field, v)
+	err := s.Get(&repo, field, v)
 	if err != nil {
 		return nil, err
 	}
@@ -58,6 +58,10 @@ func (s *ReposService) findBy(field string, v interface{}) (*Repo, error) {
 type Repo struct {
 	ID   int
 	Name string
+}
+
+func (r *Repo) table() string {
+	return "repos"
 }
 
 // RepoName returns a RepoName for this Repo.

@@ -8,11 +8,22 @@ import (
 	"bitbucket.org/liamstask/goose/lib/goose"
 )
 
+type Model interface {
+	table() string
+}
+
 // DB is an interface that allows us to CRUD records.
 type DB interface {
-	Insert(v interface{}) error
-	Update(v interface{}) error
-	Get(holder interface{}, table, field string, value interface{}) error
+	// Insert inserts the model in the database.
+	Insert(m Model) error
+
+	// Update updates the model in the database.
+	Update(m Model) error
+
+	// Get finds a Model by `field` with the value `value`.
+	Get(m Model, field string, value interface{}) error
+
+	// Close closes the database.
 	Close() error
 }
 
@@ -47,18 +58,18 @@ func NewDB(path, env string) (DB, error) {
 	return &db{DBConf: dbconf, DB: conn, Map: dbmap}, nil
 }
 
-func (d *db) Insert(v interface{}) error {
-	return d.Map.Insert(v)
+func (d *db) Insert(m Model) error {
+	return d.Map.Insert(m)
 }
 
-func (d *db) Update(v interface{}) error {
-	_, err := d.Map.Update(v)
+func (d *db) Update(m Model) error {
+	_, err := d.Map.Update(m)
 	return err
 }
 
-func (d *db) Get(holder interface{}, table, field string, value interface{}) error {
-	sql := `SELECT * FROM ` + table + ` WHERE ` + field + ` = $1 LIMIT 1`
-	return d.Map.SelectOne(holder, sql, value)
+func (d *db) Get(m Model, field string, value interface{}) error {
+	sql := `SELECT * FROM ` + m.table() + ` WHERE ` + field + ` = $1 LIMIT 1`
+	return d.Map.SelectOne(m, sql, value)
 }
 
 func (d *db) Close() error {

@@ -40,7 +40,7 @@ func (s *JobsService) Find(id int) (*Job, error) {
 func (s *JobsService) findBy(field string, v interface{}) (*Job, error) {
 	var job Job
 
-	err := s.Get(&job, "jobs", field, v)
+	err := s.Get(&job, field, v)
 	if err != nil {
 		return nil, err
 	}
@@ -64,6 +64,10 @@ type Job struct {
 	ExitStatus  *int `db:"exit_status"`
 
 	Repo *Repo `db:"-"`
+}
+
+func (j *Job) table() string {
+	return "jobs"
 }
 
 // Returns the status for this job. Returns StatusPending if the exit code
