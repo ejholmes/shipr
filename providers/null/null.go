@@ -21,7 +21,7 @@ func (p *Provider) Deploy(d shipr.Deployment) error {
 
 func (p *Provider) logger() *log.Logger {
 	if p.Logger == nil {
-		p.Logger = log.New(os.Stdout, "", 0)
+		p.Logger = log.New(os.Stdout, "[provider]", 0)
 	}
 	return p.Logger
 }

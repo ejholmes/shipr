@@ -7,7 +7,8 @@ import (
 	"os"
 
 	"github.com/remind101/shipr"
-	"github.com/remind101/shipr/providers/heroku"
+	"github.com/remind101/shipr/notifiers"
+	"github.com/remind101/shipr/providers"
 	"github.com/remind101/shipr/server"
 )
 
@@ -30,7 +31,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	c.Provider = heroku.New(c.GitHub, config.tokens.heroku)
+	//c.Provider = providers.NewHerokuProvider(c.GitHub, config.tokens.heroku)
+	c.Provider = providers.NewNullProvider()
+	c.Notifier = notifiers.NewNullNotifier()
 
 	defer c.Close()
 
@@ -50,6 +53,7 @@ func parseFlags() *config {
 	return &c
 }
 
+// Env tries to fetch key from the environment variables, and falls back to fallback if it's not present.
 func Env(key, fallback string) string {
 	v := os.Getenv(key)
 	if v == "" {

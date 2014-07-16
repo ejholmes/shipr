@@ -24,6 +24,8 @@ type Description interface {
 	Description() string
 }
 
+// Deployment is an interface that is sent to Providers when deploying. Deployments implement the
+// Description interface and also methods for updating information about the deployment.
 type Deployment interface {
 	Description
 

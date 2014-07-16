@@ -21,6 +21,9 @@ type Shipr struct {
 	// The Provider we'll use to deploy jobs.
 	Provider
 
+	// The Notifier to use to send notifications.
+	Notifier
+
 	// Clients.
 	GitHub github.Client
 }
