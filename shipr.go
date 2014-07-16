@@ -14,7 +14,6 @@ type Shipr struct {
 	Env string
 
 	// Access to services.
-	DB DB
 	*Datastore
 
 	// The Provider we'll use to deploy jobs.
@@ -36,7 +35,6 @@ func New(options *Options) (*Shipr, error) {
 
 	return &Shipr{
 		Env:       options.Env,
-		DB:        db,
 		Datastore: NewDatastore(db),
 		GitHub:    g,
 	}, nil
