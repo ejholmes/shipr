@@ -6,8 +6,7 @@ import (
 	"github.com/remind101/shipr"
 )
 
-// Job Resource
-type Job struct {
+type JobResource struct {
 	ID          int    `json:"id"`
 	Guid        int    `json:"guid"`
 	Sha         string `json:"sha"`
@@ -17,8 +16,8 @@ type Job struct {
 	ExitStatus  *int   `json:"exit_status"`
 }
 
-func NewJob(j *shipr.Job) *Job {
-	return &Job{
+func NewJobResource(j *shipr.Job) *JobResource {
+	return &JobResource{
 		ID:          j.ID,
 		Guid:        j.Guid,
 		Sha:         j.Sha,
@@ -47,5 +46,5 @@ func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
 	}
 
 	res.Status(200)
-	res.Present(NewJob(job))
+	res.Present(NewJobResource(job))
 }

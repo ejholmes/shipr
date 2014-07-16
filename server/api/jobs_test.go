@@ -44,7 +44,7 @@ func Test_JobsInfo(t *testing.T) {
 			id: fmt.Sprintf("%v", job.ID),
 			expected: &Response{
 				status: 200,
-				resource: &Job{
+				resource: &JobResource{
 					ID: 1,
 				},
 			},
