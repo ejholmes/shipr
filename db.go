@@ -12,7 +12,6 @@ import (
 type DB interface {
 	Insert(v interface{}) error
 	Update(v interface{}) error
-	//Get(holder interface{}, field string, value interface{}) error
 	SelectOne(holder interface{}, query string, args ...interface{}) error
 	Close() error
 }
