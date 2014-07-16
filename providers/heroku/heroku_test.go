@@ -8,7 +8,7 @@ import (
 	"github.com/remind101/shipr/providers/heroku/heroku"
 )
 
-func Test_NewBuildResultLines(t *testing.T) {
+func Test_NewLines(t *testing.T) {
 	tests := []struct {
 		lines []struct {
 			Line   string `json:"line"`
