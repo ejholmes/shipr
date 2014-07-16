@@ -15,13 +15,13 @@ type Notifier struct {
 
 // Notify logs the notification to Stdout.
 func (notifier *Notifier) Notify(n shipr.Notification) error {
-	notifier.logger().Println(n)
+	notifier.logger().Printf(`guid=%v state=%s`, n.Guid(), n.State())
 	return nil
 }
 
 func (notifier *Notifier) logger() *log.Logger {
 	if notifier.Logger == nil {
-		notifier.Logger = log.New(os.Stdout, "[notifier]", 0)
+		notifier.Logger = log.New(os.Stdout, "[notifier] ", 0)
 	}
 	return notifier.Logger
 }

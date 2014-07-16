@@ -15,13 +15,13 @@ type Provider struct {
 
 // Deploy logs the shipr.Deployment to Stdout.
 func (p *Provider) Deploy(d shipr.Deployment) error {
-	p.logger().Println(d)
+	p.logger().Printf(`guid=%v repo="%s"`, d.Guid(), d.RepoName())
 	return nil
 }
 
 func (p *Provider) logger() *log.Logger {
 	if p.Logger == nil {
-		p.Logger = log.New(os.Stdout, "[provider]", 0)
+		p.Logger = log.New(os.Stdout, "[provider] ", 0)
 	}
 	return p.Logger
 }

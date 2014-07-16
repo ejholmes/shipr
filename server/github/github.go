@@ -9,20 +9,20 @@ import (
 	"github.com/remind101/shipr"
 )
 
+// EventHeader is the name of the header that determines what type of event this is.
 const EventHeader = "X-GitHub-Event"
-
-type EventHandler http.Handler
 
 // Handler demuxes incoming webhooks from GitHub and handles them.
 type Handler struct {
 	http.Handler
 }
 
+// New returns a new Handler.
 func New(c *shipr.Shipr) http.Handler {
 	m := mux.NewRouter()
 	h := &Handler{m}
 
-	var handlers = map[string]EventHandler{
+	var handlers = map[string]http.Handler{
 		"deployment":        &DeploymentHandler{c},
 		"deployment_status": &DeploymentStatusHandler{c},
 	}
@@ -34,6 +34,7 @@ func New(c *shipr.Shipr) http.Handler {
 	return h
 }
 
+// DeploymentHandler handles "deployment" events.
 type DeploymentHandler struct {
 	*shipr.Shipr
 }
@@ -45,11 +46,16 @@ func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.Deploy(&description{&d})
 }
 
+// DeploymentStatusHandler handles "deployment_status" events.
 type DeploymentStatusHandler struct {
 	*shipr.Shipr
 }
 
 func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var d github.DeploymentStatus
+	decodeRequest(r, &d)
+
+	h.Notify(newNotification(&d))
 }
 
 func decodeRequest(r *http.Request, v interface{}) {
