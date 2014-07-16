@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -8,14 +9,14 @@ import (
 )
 
 type jobsInfoTest struct {
-	id       func(*shipr.Shipr) string
+	id       func(*testing.T, *shipr.Shipr) string
 	expected *Response
 }
 
 func Test_JobsInfo(t *testing.T) {
 	tests := []jobsInfoTest{
 		{
-			id: func(c *shipr.Shipr) string {
+			id: func(t *testing.T, c *shipr.Shipr) string {
 				return "1"
 			},
 			expected: &Response{
@@ -25,12 +26,36 @@ func Test_JobsInfo(t *testing.T) {
 				},
 			},
 		},
+		{
+			id: func(t *testing.T, c *shipr.Shipr) string {
+				r := &shipr.Repo{}
+				err := c.Repos.Insert(r)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				j := &shipr.Job{Repo: r, RepoID: r.ID}
+				err = c.Jobs.Insert(j)
+				if err != nil {
+					t.Fatal(err)
+				}
+				return fmt.Sprintf("%v", j.ID)
+			},
+			expected: &Response{
+				status: 200,
+				resource: &Job{
+					ID: 1,
+				},
+			},
+		},
 	}
 
 	for i, test := range tests {
 		c := testShipr(t)
+		c.Reset()
+
 		res := &Response{}
-		req := &Request{vars: map[string]string{"id": test.id(c)}}
+		req := &Request{vars: map[string]string{"id": test.id(t, c)}}
 
 		JobsInfo(c, res, req)
 

@@ -25,6 +25,9 @@ type DB interface {
 
 	// Close closes the database.
 	Close() error
+
+	// Reset resets the database.
+	Reset() error
 }
 
 // db is an implementation of the DB interface backed by gorp and postgres.
@@ -74,6 +77,15 @@ func (d *db) Get(m Model, field string, value interface{}) error {
 
 func (d *db) Close() error {
 	return d.DB.Close()
+}
+
+func (d *db) Reset() error {
+	_, err := d.Map.Exec(`truncate table repos restart identity cascade`)
+	if err != nil {
+		return err
+	}
+	_, err = d.Map.Exec(`truncate table jobs restart identity cascade`)
+	return err
 }
 
 // Datastore holds all of our services and DB reference.
