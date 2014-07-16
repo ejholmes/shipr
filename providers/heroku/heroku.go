@@ -16,15 +16,15 @@ type Provider struct {
 	heroku heroku.Client
 }
 
-// newHerokuProvider builds a new herokuProvider and returns it.
+// New builds a new herokuProvider and returns it.
 func New(g github.Client, token string) shipr.Provider {
 	h := heroku.New(token)
 	return &Provider{g, h}
 }
 
-// Provider implements the Provider interface. Builds a new herokuDeploy and runs it.
-func (h *Provider) Deploy(d shipr.Deployment) error {
-	return newDeploy(h, d).run()
+// Deploy creates a new heroku build and runs it.
+func (p *Provider) Deploy(d shipr.Deployment) error {
+	return newDeploy(p, d).run()
 }
 
 // deploy wraps a shipr.Deployment for managing the Heroku build process.
@@ -34,8 +34,8 @@ type deploy struct {
 }
 
 // newHerokuDeploy builds a new herokuDeploy and returns it.
-func newDeploy(h *Provider, d shipr.Deployment) *deploy {
-	return &deploy{h, d}
+func newDeploy(p *Provider, d shipr.Deployment) *deploy {
+	return &deploy{p, d}
 }
 
 // run runs the build process.
