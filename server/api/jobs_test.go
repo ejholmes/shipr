@@ -9,16 +9,30 @@ import (
 )
 
 type jobsInfoTest struct {
-	id       func(*testing.T, *shipr.Shipr) string
+	id       string
 	expected *Response
 }
 
 func Test_JobsInfo(t *testing.T) {
+	c := testShipr(t)
+	c.Reset()
+
+	// Insert some test data.
+	repo := &shipr.Repo{}
+	err := c.Repos.Insert(repo)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	job := &shipr.Job{Repo: repo, RepoID: repo.ID}
+	err = c.Jobs.Insert(job)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	tests := []jobsInfoTest{
 		{
-			id: func(t *testing.T, c *shipr.Shipr) string {
-				return "1"
-			},
+			id: "1024",
 			expected: &Response{
 				status: 404,
 				resource: &ErrorResponse{
@@ -27,20 +41,7 @@ func Test_JobsInfo(t *testing.T) {
 			},
 		},
 		{
-			id: func(t *testing.T, c *shipr.Shipr) string {
-				r := &shipr.Repo{}
-				err := c.Repos.Insert(r)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				j := &shipr.Job{Repo: r, RepoID: r.ID}
-				err = c.Jobs.Insert(j)
-				if err != nil {
-					t.Fatal(err)
-				}
-				return fmt.Sprintf("%v", j.ID)
-			},
+			id: fmt.Sprintf("%v", job.ID),
 			expected: &Response{
 				status: 200,
 				resource: &Job{
@@ -51,11 +52,8 @@ func Test_JobsInfo(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		c := testShipr(t)
-		c.Reset()
-
 		res := &Response{}
-		req := &Request{vars: map[string]string{"id": test.id(t, c)}}
+		req := &Request{vars: map[string]string{"id": test.id}}
 
 		JobsInfo(c, res, req)
 
