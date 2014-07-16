@@ -1,11 +1,11 @@
-package shipr
+package heroku
 
 import (
 	"reflect"
 	"testing"
 
 	h "github.com/ejholmes/heroku-go/v3"
-	"github.com/remind101/shipr/heroku"
+	"github.com/remind101/shipr/providers/heroku/heroku"
 )
 
 func Test_NewBuildResultLines(t *testing.T) {
@@ -15,7 +15,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 			Stream string `json:"stream"`
 		}
 		idx      int
-		expected []*herokuLogLine
+		expected []*logLine
 	}{
 		{
 			idx: 0,
@@ -25,7 +25,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 			}{
 				{Line: "Hello\n", Stream: "STDOUT"},
 			},
-			expected: []*herokuLogLine{
+			expected: []*logLine{
 				{Line: "Hello\n", Stream: "STDOUT"},
 			},
 		},
@@ -38,7 +38,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 				{Line: "Hello\n", Stream: "STDOUT"},
 				{Line: "World\n", Stream: "STDOUT"},
 			},
-			expected: []*herokuLogLine{
+			expected: []*logLine{
 				{Line: "Hello\n", Stream: "STDOUT"},
 				{Line: "World\n", Stream: "STDOUT"},
 			},
@@ -52,7 +52,7 @@ func Test_NewBuildResultLines(t *testing.T) {
 				{Line: "Hello\n", Stream: "STDOUT"},
 				{Line: "World\n", Stream: "STDOUT"},
 			},
-			expected: []*herokuLogLine{
+			expected: []*logLine{
 				{Line: "World\n", Stream: "STDOUT"},
 			},
 		},

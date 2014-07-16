@@ -1,9 +1,6 @@
 package shipr
 
-import (
-	"github.com/remind101/shipr/github"
-	"github.com/remind101/shipr/heroku"
-)
+import "github.com/remind101/shipr/github"
 
 type Options struct {
 	Env         string
@@ -34,18 +31,13 @@ func New(options *Options) (*Shipr, error) {
 		return nil, err
 	}
 
-	// Setup a client for talking to GitHub and Heroku.
+	// Setup a client for talking to GitHub.
 	g := github.New(options.GitHubToken)
-	h := heroku.New(options.HerokuToken)
-
-	// Setup the Heroku deployer.
-	provider := newHerokuProvider(g, h)
 
 	return &Shipr{
 		Env:       options.Env,
 		db:        db,
 		Datastore: NewDatastore(db),
-		Provider:  provider,
 		GitHub:    g,
 	}, nil
 }

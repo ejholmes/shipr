@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/remind101/shipr"
+	"github.com/remind101/shipr/providers/heroku"
 	"github.com/remind101/shipr/server"
 )
 
@@ -24,11 +25,12 @@ func main() {
 		DBDir:       config.dbdir,
 		Env:         config.env,
 		GitHubToken: config.tokens.github,
-		HerokuToken: config.tokens.heroku,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	c.Provider = heroku.New(c.GitHub, config.tokens.heroku)
 
 	defer c.Close()
 
