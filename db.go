@@ -12,7 +12,7 @@ import (
 type DB interface {
 	Insert(v interface{}) error
 	Update(v interface{}) error
-	SelectOne(holder interface{}, query string, args ...interface{}) error
+	Get(holder interface{}, table, field string, value interface{}) error
 	Close() error
 }
 
@@ -56,8 +56,9 @@ func (d *db) Update(v interface{}) error {
 	return err
 }
 
-func (d *db) SelectOne(holder interface{}, query string, args ...interface{}) error {
-	return d.Map.SelectOne(holder, query, args...)
+func (d *db) Get(holder interface{}, table, field string, value interface{}) error {
+	sql := `SELECT * FROM ` + table + ` WHERE ` + field + ` = $1 LIMIT 1`
+	return d.Map.SelectOne(holder, sql, value)
 }
 
 func (d *db) Close() error {

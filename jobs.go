@@ -40,8 +40,7 @@ func (s *JobsService) Find(id int) (*Job, error) {
 func (s *JobsService) findBy(field string, v interface{}) (*Job, error) {
 	var job Job
 
-	sql := `SELECT * FROM jobs WHERE ` + field + ` = $1 LIMIT 1`
-	err := s.SelectOne(&job, sql, v)
+	err := s.Get(&job, "jobs", field, v)
 	if err != nil {
 		return nil, err
 	}
