@@ -2,6 +2,7 @@ package shipr
 
 import "github.com/remind101/shipr/github"
 
+// Options is a struct for passing options to New.
 type Options struct {
 	Env         string
 	DBDir       string
@@ -9,6 +10,7 @@ type Options struct {
 	HerokuToken string
 }
 
+// Shipr context.
 type Shipr struct {
 	// The environment (e.g. production, staging, etc..)
 	Env string
@@ -23,7 +25,7 @@ type Shipr struct {
 	GitHub github.Client
 }
 
-// Returns a new Shipr context.
+// New returns a new Shipr instance.
 func New(options *Options) (*Shipr, error) {
 	db, err := NewDB(options.DBDir, options.Env)
 	if err != nil {
@@ -50,6 +52,7 @@ func (c *Shipr) Deploy(d Description) error {
 	return c.Provider.Deploy(&deployment{c.Datastore, j})
 }
 
+// Close closes the database connection.
 func (c *Shipr) Close() error {
 	return c.DB.Close()
 }

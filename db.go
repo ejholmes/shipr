@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/liamstask/goose/lib/goose"
 )
 
+// Model is an interface that represents a model.
 type Model interface {
 	table() string
 }
@@ -42,6 +43,7 @@ type db struct {
 	Map *gorp.DbMap
 }
 
+// NewDB returns a new db instance.
 func NewDB(path, env string) (DB, error) {
 	dbconf, err := goose.NewDBConf(path, env)
 	if err != nil {
