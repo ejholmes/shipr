@@ -2,10 +2,16 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
+)
+
+var (
+	// ErrNotFound is an error that represents a 404 error.
+	ErrNotFound = errors.New("Not Found")
 )
 
 // API serves http requests for the API.
@@ -62,15 +68,15 @@ func (w *Response) Present(resource interface{}) {
 }
 
 // Error takes a string error message and presents it.
-func (w *Response) Error(code int, msg string) {
-	res := &ErrorResponse{Error: msg}
+func (w *Response) Error(code int, err error) {
+	res := &ErrorResponse{Error: err.Error()}
 	w.Status(code)
 	w.Present(res)
 }
 
 // NotFound returns a standard 404 Not Found response.
 func (w *Response) NotFound() {
-	w.Error(404, "Not Found")
+	w.Error(404, ErrNotFound)
 }
 
 // ErrorResponse is the format we respond with when there's an error.
