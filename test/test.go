@@ -6,33 +6,38 @@ import (
 	"github.com/remind101/shipr"
 )
 
-// Notification is a fake implementation of the shipr.Notification interface.
-type Notification struct {
-	RawState string
+// description is a fake implementation of the shipr.Description interface.
+type description struct {
 }
 
-func (n *Notification) Guid() int {
+func (d *description) Guid() int {
 	return 1234
 }
 
-func (n *Notification) Sha() string {
+func (d *description) Sha() string {
 	return "208db1b5d2bb89b0ff0b79cb7f702e21a750f3fc"
 }
 
-func (n *Notification) Ref() string {
+func (d *description) Ref() string {
 	return "master"
 }
 
-func (n *Notification) RepoName() shipr.RepoName {
+func (d *description) RepoName() shipr.RepoName {
 	return shipr.RepoName("remind101/r101-api")
 }
 
-func (n *Notification) Description() string {
+func (d *description) Description() string {
 	return "Deploying my repo"
 }
 
-func (n *Notification) Environment() string {
+func (d *description) Environment() string {
 	return "staging"
+}
+
+// Notification is a fake implementation of the shipr.Notification interface.
+type Notification struct {
+	description
+	RawState string
 }
 
 func (n *Notification) URL() *url.URL {
