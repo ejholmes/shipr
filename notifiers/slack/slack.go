@@ -10,15 +10,15 @@ import (
 
 // attachment represents a color/message combination.
 type attachment struct {
-	color   string
-	message string
+	color    string
+	template string
 }
 
 var templates = map[string]attachment{
-	"pending": attachment{"#ff0", "{{.User}} is <{{.URL}}|deploying> {{.Name}}@{{.Sha}} to {{.Environment}}"},
-	"success": attachment{"#0f0", "{{.User}} <{{.URL}}|deployed> {{.Name}}@{{.Sha}} to {{.Environment}}"},
-	"failure": attachment{"#f00", "{{.User}} failed to <{{.URL}}|deploy> {{.Name}}@{{.Sha}} to {{.Environment}}"},
-	"error":   attachment{"#f00", "{{.User}} failed to <{{.URL}}|deploy> {{.Name}}@{{.Sha}} to {{.Environment}}"},
+	"pending": attachment{"#ff0", "{{.User}} is <{{.URL}}|deploying> {{.Repo}}@{{.Sha}} to {{.Environment}}"},
+	"success": attachment{"#0f0", "{{.User}} <{{.URL}}|deployed> {{.Repo}}@{{.Sha}} to {{.Environment}}"},
+	"failure": attachment{"#f00", "{{.User}} failed to <{{.URL}}|deploy> {{.Repo}}@{{.Sha}} to {{.Environment}}"},
+	"error":   attachment{"#f00", "{{.User}} failed to <{{.URL}}|deploy> {{.Repo}}@{{.Sha}} to {{.Environment}}"},
 }
 
 // Notifier implements the shipr.Notifier interface for sending status update
@@ -47,7 +47,7 @@ type notification struct {
 
 	User        string
 	URL         string
-	Name        string
+	Repo        string
 	Sha         string
 	Environment string
 
@@ -57,7 +57,7 @@ type notification struct {
 func newNotification(n shipr.Notification) *notification {
 	return &notification{
 		User:        n.User(),
-		Name:        n.RepoName().Repo(),
+		Repo:        n.RepoName().Repo(),
 		URL:         n.URL().String(),
 		Sha:         n.Sha(),
 		Environment: n.Environment(),
@@ -86,7 +86,7 @@ func (n *notification) Payload() (*slack.Payload, error) {
 func (n *notification) message() (string, error) {
 	var b bytes.Buffer
 
-	t, err := template.New("message").Parse(n.attachment.message)
+	t, err := template.New("message").Parse(n.attachment.template)
 	if err != nil {
 		return "", err
 	}
