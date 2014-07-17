@@ -7,28 +7,6 @@ import (
 	"github.com/remind101/shipr/github"
 )
 
-// Provider is an interface that can be implemented for deploying a Deployment to
-// some platform.
-type Provider interface {
-	Deploy(Deployment) error
-}
-
-// Notification is an interface that is provided to Notifiers when there is a status
-// update on a deploy.
-type Notification interface {
-	Description
-
-	URL() *url.URL
-	User() string
-	State() string
-}
-
-// Notifier is an interface that notifiers can implement to forward notifications
-// to an external system, like HipChat or Slack.
-type Notifier interface {
-	Notify(Notification) error
-}
-
 // Description is an interface that's describes information about a deployment.
 // This can be used to create jobs, and is also implemented by Job.
 type Description interface {
@@ -58,6 +36,28 @@ type Deployment interface {
 
 	AddLine(string, time.Time) error
 	SetExitCode(int) error
+}
+
+// Notification is an interface that is provided to Notifiers when there is a status
+// update on a deploy.
+type Notification interface {
+	Description
+
+	URL() *url.URL
+	User() string
+	State() string
+}
+
+// Provider is an interface that can be implemented for deploying a Deployment to
+// some platform.
+type Provider interface {
+	Deploy(Deployment) error
+}
+
+// Notifier is an interface that notifiers can implement to forward notifications
+// to an external system, like HipChat or Slack.
+type Notifier interface {
+	Notify(Notification) error
 }
 
 // Options is a struct for passing options to New.
