@@ -9,9 +9,20 @@ import (
 	"github.com/remind101/shipr"
 )
 
+// Error represents an http error.
+type Error struct {
+	error
+	Status int
+}
+
+// ErrorResponse is the format we respond with when there's an error.
+type ErrorResponse struct {
+	Error *Error `json:"error"`
+}
+
 var (
 	// ErrNotFound is an error that represents a 404 error.
-	ErrNotFound = errors.New("Not Found")
+	ErrNotFound = &Error{error: errors.New("Not Found"), Status: 404}
 )
 
 // API serves http requests for the API.
@@ -68,20 +79,15 @@ func (w *Response) Present(resource interface{}) {
 }
 
 // Error takes a string error message and presents it.
-func (w *Response) Error(code int, err error) {
-	res := &ErrorResponse{Error: err.Error()}
-	w.Status(code)
+func (w *Response) Error(err *Error) {
+	res := &ErrorResponse{Error: err}
+	w.Status(err.Status)
 	w.Present(res)
 }
 
 // NotFound returns a standard 404 Not Found response.
 func (w *Response) NotFound() {
-	w.Error(404, ErrNotFound)
-}
-
-// ErrorResponse is the format we respond with when there's an error.
-type ErrorResponse struct {
-	Error string `json:"error"`
+	w.Error(ErrNotFound)
 }
 
 // Var returns a single URL param.

@@ -36,7 +36,7 @@ func Test_JobsInfo(t *testing.T) {
 			expected: &Response{
 				status: 404,
 				resource: &ErrorResponse{
-					Error: "Not Found",
+					Error: ErrNotFound,
 				},
 			},
 		},
