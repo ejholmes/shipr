@@ -31,7 +31,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//c.Provider = providers.NewHerokuProvider(c.GitHub, config.tokens.heroku)
 	c.Provider = providers.NewNullProvider()
 	c.Notifier = notifiers.NewNullNotifier()
 

@@ -1,10 +1,14 @@
 package shipr
 
+import "net/url"
+
 // Notification is an interface that is provided to Notifiers when there is a status
 // update on a deploy.
 type Notification interface {
 	Description
 
+	URL() *url.URL
+	User() string
 	State() string
 }
 
