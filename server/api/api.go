@@ -43,7 +43,7 @@ func New(c *shipr.Shipr) http.Handler {
 }
 
 // Handle takes a path and a Handler func to handle requests to path.
-func (a *API) Handle(method, path string, hd Handler) {
+func (a *API) Handle(method, path string, hd HandlerFunc) {
 	h := &handler{a.Shipr, hd, method}
 	a.router.Handle(path, h).Methods(method)
 }
@@ -53,9 +53,9 @@ func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	a.router.ServeHTTP(w, r)
 }
 
-// Handler is a function signature that can handle a request and return a status code,
+// HandlerFunc is a function signature that can handle a request and return a status code,
 // and a response object.
-type Handler func(*shipr.Shipr, *Response, *Request)
+type HandlerFunc func(*shipr.Shipr, *Response, *Request)
 
 // Request wraps http.Request.
 type Request struct {
@@ -95,10 +95,10 @@ func (r *Request) Var(v string) string {
 	return r.vars[v]
 }
 
-// handler wraps a Handler to return a proper JSON response.
+// handler wraps a HandlerFunc to return a proper JSON response.
 type handler struct {
 	*shipr.Shipr
-	handle Handler
+	handle HandlerFunc
 	method string
 }
 
