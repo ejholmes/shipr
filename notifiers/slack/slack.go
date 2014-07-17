@@ -8,12 +8,6 @@ import (
 	"github.com/remind101/shipr/notifiers/slack/slack"
 )
 
-// attachment represents a color/message combination.
-type attachment struct {
-	color    string
-	template string
-}
-
 var templates = map[string]attachment{
 	"pending": attachment{"#ff0", "{{.User}} is <{{.URL}}|deploying> {{.Repo}}@{{.Sha}} to {{.Environment}}"},
 	"success": attachment{"#0f0", "{{.User}} <{{.URL}}|deployed> {{.Repo}}@{{.Sha}} to {{.Environment}}"},
@@ -51,7 +45,7 @@ type notification struct {
 	Sha         string
 	Environment string
 
-	attachment attachment
+	attachment
 }
 
 func newNotification(n shipr.Notification) *notification {
@@ -67,31 +61,44 @@ func newNotification(n shipr.Notification) *notification {
 
 // Payload returns a slack.Payload for this notification.
 func (n *notification) Payload() (*slack.Payload, error) {
-	msg, err := n.message()
+	a, err := n.Attachment(n)
 	if err != nil {
 		return nil, err
-	}
-
-	color := n.attachment.color
-	a := &slack.Attachment{
-		Text:     msg,
-		Fallback: msg,
-		Color:    color,
 	}
 
 	return &slack.Payload{Attachments: []*slack.Attachment{a}}, nil
 }
 
-// message returns the rendered message.
-func (n *notification) message() (string, error) {
+// attachment represents a color/message combination.
+type attachment struct {
+	color    string
+	template string
+}
+
+// Attachment renders the template using the data provided and returns a slack.Attachment.
+func (a *attachment) Attachment(data interface{}) (*slack.Attachment, error) {
+	msg, err := a.message(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return &slack.Attachment{
+		Text:     msg,
+		Fallback: msg,
+		Color:    a.color,
+	}, nil
+}
+
+// message returns rendered template.
+func (a *attachment) message(data interface{}) (string, error) {
 	var b bytes.Buffer
 
-	t, err := template.New("message").Parse(n.attachment.template)
+	t, err := template.New("message").Parse(a.template)
 	if err != nil {
 		return "", err
 	}
 
-	err = t.Execute(&b, n)
+	err = t.Execute(&b, data)
 	if err != nil {
 		return "", err
 	}
