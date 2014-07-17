@@ -57,7 +57,7 @@ type notification struct {
 func newNotification(n shipr.Notification) *notification {
 	return &notification{
 		User:        n.User(),
-		Name:        string(n.RepoName()),
+		Name:        n.RepoName().Repo(),
 		URL:         n.URL().String(),
 		Sha:         n.Sha(),
 		Environment: n.Environment(),

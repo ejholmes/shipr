@@ -1,4 +1,4 @@
-.PHONY: down up build
+.PHONY: down up build test
 
 test:
 	godep go test ./...
