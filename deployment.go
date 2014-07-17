@@ -2,37 +2,6 @@ package shipr
 
 import "time"
 
-// Description is an interface that's describes information about a deployment.
-// This can be used to create jobs, and is also implemented by Job.
-type Description interface {
-	// Guid should return a unique identifier for this deployment.
-	Guid() int
-
-	// RepoName should return the string name of the repo to deploy.
-	RepoName() RepoName
-
-	// Sha should return the git sha that we want to deploy.
-	Sha() string
-
-	// Ref should return the git ref that is being requested.
-	Ref() string
-
-	// Environment should return the name of the environment that the repo is being deploy to.
-	Environment() string
-
-	// Description should return a string description for the deploy.
-	Description() string
-}
-
-// Deployment is an interface that is sent to Providers when deploying. Deployments implement the
-// Description interface and also methods for updating information about the deployment.
-type Deployment interface {
-	Description
-
-	AddLine(string, time.Time) error
-	SetExitCode(int) error
-}
-
 // deployment is an implementation of the Deployment interface backed by the
 // jobs table.
 type deployment struct {
