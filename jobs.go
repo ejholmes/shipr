@@ -1,10 +1,16 @@
 package shipr
 
+// JobStatus represents the status of the job.
 type JobStatus int
 
 const (
+	// StatusPending means the job is pending.
 	StatusPending JobStatus = iota
+
+	// StatusFailed means the job failed.
 	StatusFailed
+
+	// StatusSucceeded means the job succeeded.
 	StatusSucceeded
 )
 
@@ -13,6 +19,8 @@ type JobsService struct {
 	*Datastore
 }
 
+// CreateFromDescription creates a new job from an object implementing the description
+// interface.
 func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
 	repo, err := s.Repos.FindOrCreateByName(string(d.RepoName()))
 	if err != nil {
@@ -32,6 +40,7 @@ func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
 	return job, s.Insert(job)
 }
 
+// Find finds a single job by id.
 func (s *JobsService) Find(id int) (*Job, error) {
 	return s.findBy("id", id)
 }
@@ -52,6 +61,7 @@ func (s *JobsService) findBy(field string, v interface{}) (*Job, error) {
 	return &job, err
 }
 
+// Job maps the fields from the `jobs` table.
 type Job struct {
 	ID          int
 	RepoID      int `db:"repo_id"`
@@ -66,11 +76,7 @@ type Job struct {
 	Repo *Repo `db:"-"`
 }
 
-func (j *Job) table() string {
-	return "jobs"
-}
-
-// Returns the status for this job. Returns StatusPending if the exit code
+// Status returns the status for this job. Returns StatusPending if the exit code
 // is nil.
 func (j *Job) Status() (status JobStatus) {
 	if j.ExitStatus != nil {
@@ -83,11 +89,10 @@ func (j *Job) Status() (status JobStatus) {
 	return
 }
 
-// Returns if the job is done or not.
+// IsDone returns if the job is done or not.
 func (j *Job) IsDone() bool {
 	if j.Status() != StatusPending {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
