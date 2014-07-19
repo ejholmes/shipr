@@ -22,7 +22,7 @@ type JobsService struct {
 // CreateFromDescription creates a new job from an object implementing the description
 // interface.
 func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
-	repo, err := s.Repos.FindOrCreateByName(string(d.RepoName()))
+	repo, err := s.Repos.FindOrCreateByName(d.RepoName().String())
 	if err != nil {
 		return nil, err
 	}

@@ -82,6 +82,11 @@ func (n RepoName) Repo() string {
 	return n.parts()[1]
 }
 
+// String implements the Stringer interface.
+func (n RepoName) String() string {
+	return string(n)
+}
+
 // Parts returns the owner/repo parts.
 func (n RepoName) parts() []string {
 	return strings.SplitN(string(n), "/", 2)
