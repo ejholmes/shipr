@@ -20,11 +20,6 @@ type Server struct {
 func NewServer(c *shipr.Shipr) *Server {
 	m := mux.NewRouter()
 
-	// Health checking.
-	m.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok\n"))
-	}))
-
 	// GitHub webhooks.
 	m.Handle("/github", github.New(c))
 
@@ -34,6 +29,7 @@ func NewServer(c *shipr.Shipr) *Server {
 	// Middleware.
 	n := negroni.New()
 	n.Use(negroni.NewRecovery())
+	n.Use(negroni.NewStatic(http.Dir("server/frontend")))
 	n.UseHandler(m)
 
 	return &Server{c, n}
