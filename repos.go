@@ -42,7 +42,7 @@ func (s *ReposService) Find(id int) (*Repo, error) {
 func (s *ReposService) findBy(field string, v interface{}) (*Repo, error) {
 	var repo Repo
 
-	err := s.Get(&repo, field, v)
+	err := s.Get("repos", &repo, field, v)
 	if err != nil {
 		return nil, err
 	}

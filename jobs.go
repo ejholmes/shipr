@@ -40,7 +40,7 @@ func (s *JobsService) Find(id int) (*Job, error) {
 func (s *JobsService) findBy(field string, v interface{}) (*Job, error) {
 	var job Job
 
-	err := s.Get(&job, field, v)
+	err := s.Get("jobs", &job, field, v)
 	if err != nil {
 		return nil, err
 	}
