@@ -7,6 +7,7 @@ type LogLinesService struct {
 	*Datastore
 }
 
+// CreateLine creates a new log line for the given job.
 func (c *LogLinesService) CreateLine(job *Job, output string, timestamp time.Time) (*LogLine, error) {
 	l := &LogLine{
 		JobID:     job.ID,
@@ -18,6 +19,7 @@ func (c *LogLinesService) CreateLine(job *Job, output string, timestamp time.Tim
 	return l, c.Insert(l)
 }
 
+// LogLine maps fields from the `log_lines` table.
 type LogLine struct {
 	ID        int
 	JobID     int `db:"job_id"`
@@ -26,8 +28,4 @@ type LogLine struct {
 
 	// Memoized Job.
 	Job *Job `db:"-"`
-}
-
-func (l *LogLine) table() string {
-	return "log_lines"
 }

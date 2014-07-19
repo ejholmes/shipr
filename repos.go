@@ -60,10 +60,6 @@ type Repo struct {
 	Name string
 }
 
-func (r *Repo) table() string {
-	return "repos"
-}
-
 // RepoName returns a RepoName for this Repo.
 func (r *Repo) RepoName() RepoName {
 	return RepoName(r.Name)
