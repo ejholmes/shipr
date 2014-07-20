@@ -14,6 +14,20 @@ const (
 	StatusSucceeded
 )
 
+// String implements the Stringer interface.
+func (s JobStatus) String() string {
+	switch s {
+	case StatusPending:
+		return "pending"
+	case StatusFailed:
+		return "failed"
+	case StatusSucceeded:
+		return "succeeded"
+	default:
+		return "unkown"
+	}
+}
+
 // JobsService manages the `jobs` table.
 type JobsService struct {
 	*Datastore

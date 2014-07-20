@@ -64,7 +64,7 @@
        * @return {Boolean}
        */
       isStarted: function() {
-        return !!this.output.length;
+        return this.status != 'pending';
       },
 
       /**

@@ -14,6 +14,7 @@ type JobResource struct {
 	Environment string `json:"environment"`
 	Force       bool   `json:"force"`
 	ExitStatus  *int   `json:"exit_status"`
+	Status      string `json:"status"`
 }
 
 func NewJobResource(j *shipr.Job) *JobResource {
@@ -24,6 +25,7 @@ func NewJobResource(j *shipr.Job) *JobResource {
 		Ref:         j.Ref,
 		Environment: j.Environment,
 		ExitStatus:  j.ExitStatus,
+		Status:      j.Status().String(),
 	}
 }
 

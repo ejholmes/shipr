@@ -3,6 +3,7 @@ package null
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/remind101/shipr"
 )
@@ -16,6 +17,8 @@ type Provider struct {
 // Deploy logs the shipr.Deployment to Stdout.
 func (p *Provider) Deploy(d shipr.Deployment) error {
 	p.logger().Printf(`guid=%v repo="%s"`, d.Guid(), d.RepoName())
+	d.AddLine("Hello World\n", time.Now())
+	d.SetExitCode(0)
 	return nil
 }
 

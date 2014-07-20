@@ -10,6 +10,8 @@
   });
 
   module.controller('JobsDetailCtrl', function($scope, $state, job) {
+    $scope.job = job;
+
     $scope.restart = function() {
       $scope.job.restart().then(function(job) {
         $state.go('app.jobs.detail', { jobId: job.id });

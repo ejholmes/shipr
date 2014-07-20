@@ -79,7 +79,7 @@
             <span class='is-failed' ng-if='job.isFailed()'>Failed</span>
           </h1>
           <p class='job__destination'>
-            <strong ng-bind='job.sha'></strong>
+            <strong ng-bind='job.ref' title="{{ job.sha }}"></strong>
             &#8674;
             <strong ng-bind='job.environment'></strong>
           </p>
