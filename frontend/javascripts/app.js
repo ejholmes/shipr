@@ -1,10 +1,3 @@
-//= require ./ansi_up
-//= require ./directives
-//= require ./services
-//= require ./filters
-//= require ./controllers
-//= require_self
-
 (function(angular) {
   'use strict';
 
