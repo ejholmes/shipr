@@ -1,7 +1,8 @@
 var gulp = require('gulp')
     concat = require('gulp-concat'),
     uglify = require('gulp-uglify')
-    rev = require('gulp-rev');
+    rev = require('gulp-rev')
+    sass = require('gulp-sass');
 
 var build = '../server/frontend';
 
@@ -9,6 +10,12 @@ gulp.task('javascripts', function() {
   return gulp.src('javascripts/**/*.js')
     .pipe(concat('app.js'))
     .pipe(gulp.dest(build));
+});
+
+gulp.task('sass', function() {
+  return gulp.src('stylesheets/**/*.scss')
+    .pipe(sass())
+    .pipe(gulp.dest(build))
 });
 
 gulp.task('rev', ['javascripts'], function() {
