@@ -1,21 +1,56 @@
 package api
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
+	"github.com/ejholmes/buble"
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
 )
 
-// Error represents an http error.
+// API implements the http.ServeHTTP interface for serving up the api.
+type API struct {
+	shipr  *shipr.Shipr
+	router *mux.Router
+}
+
+// New returns a new API.
+func New(c *shipr.Shipr) *API {
+	a := &API{shipr: c, router: mux.NewRouter()}
+
+	// Routes
+	a.Handle("GET", "/jobs", JobsList)
+	a.Handle("GET", "/jobs/{id}", JobsInfo)
+
+	return a
+}
+
+// Handle takes a method, path and a HandlerFunc and adds a route to handle
+// requests.
+func (a *API) Handle(method, path string, fn HandlerFunc) {
+	h := &buble.Handler{
+		HandlerFunc: func(w buble.ResponseWriter, r *buble.Request) {
+			resp := &Response{ResponseWriter: w}
+			req := &Request{Request: r, vars: mux.Vars(r.Request)}
+			fn(a.shipr, resp, req)
+		},
+	}
+	a.router.Handle(path, h).Methods(method)
+}
+
+// ServeHTTP implements the http.ServeHTTP interface.
+func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	a.router.ServeHTTP(w, r)
+}
+
+// Error represents our error interface.
 type Error struct {
 	error
 	Status int
 }
 
-// ErrorResponse is the format we respond with when there's an error.
+// ErrorResponse represents our api error resource.
 type ErrorResponse struct {
 	Error *Error `json:"error"`
 }
@@ -25,89 +60,40 @@ var (
 	ErrNotFound = &Error{error: errors.New("Not Found"), Status: 404}
 )
 
-// API serves http requests for the API.
-type API struct {
-	*shipr.Shipr
-	router *mux.Router
+// ResponseWriter wraps an http.ResponseWriter with convenience methods.
+type ResponseWriter interface {
+	buble.ResponseWriter
+	Error(*Error)
+	NotFound()
 }
 
-// New returns a new instance of API, with all of the routes added.
-func New(c *shipr.Shipr) http.Handler {
-	a := &API{c, mux.NewRouter()}
-
-	// Routes
-	a.Handle("GET", "/jobs", JobsList)
-	a.Handle("GET", "/jobs/{id}", JobsInfo)
-
-	return a
+// Response wraps a buble.Response.
+type Response struct {
+	buble.ResponseWriter
 }
 
-// Handle takes a path and a Handler func to handle requests to path.
-func (a *API) Handle(method, path string, hd HandlerFunc) {
-	h := &handler{a.Shipr, hd, method}
-	a.router.Handle(path, h).Methods(method)
+// Error sets the status code associated with this error then encodes the error resource
+// into the response.
+func (r *Response) Error(err *Error) {
+	r.WriteHeader(err.Status)
+	r.Encode(&ErrorResponse{Error: err})
 }
 
-// ServeHTTP implements the http.Handler interface.
-func (a *API) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	a.router.ServeHTTP(w, r)
+// NotFound returns with an ErrNotFound response.
+func (r *Response) NotFound() {
+	r.Error(ErrNotFound)
 }
 
-// HandlerFunc is a function signature that can handle a request and return a status code,
-// and a response object.
-type HandlerFunc func(*shipr.Shipr, *Response, *Request)
-
-// Request wraps http.Request.
+// Request wraps a buble.Request.
 type Request struct {
+	*buble.Request
 	vars map[string]string
 }
 
-// Response is an object for building a response.
-type Response struct {
-	resource interface{}
-	status   int
+// Var returns a mux variable from the url.
+func (r *Request) Var(key string) string {
+	return r.vars[key]
 }
 
-// Status sets the status code.
-func (w *Response) Status(code int) {
-	w.status = code
-}
-
-// Present presents the interface in JSON format.
-func (w *Response) Present(resource interface{}) {
-	w.resource = resource
-}
-
-// Error takes a string error message and presents it.
-func (w *Response) Error(err *Error) {
-	res := &ErrorResponse{Error: err}
-	w.Status(err.Status)
-	w.Present(res)
-}
-
-// NotFound returns a standard 404 Not Found response.
-func (w *Response) NotFound() {
-	w.Error(ErrNotFound)
-}
-
-// Var returns a single URL param.
-func (r *Request) Var(v string) string {
-	return r.vars[v]
-}
-
-// handler wraps a HandlerFunc to return a proper JSON response.
-type handler struct {
-	*shipr.Shipr
-	handle HandlerFunc
-	method string
-}
-
-func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	res := &Response{}
-	req := &Request{vars: mux.Vars(r)}
-	h.handle(h.Shipr, res, req)
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(res.status)
-	json.NewEncoder(w).Encode(res.resource)
-}
+// HandlerFunc is the method signature for api handlers.
+type HandlerFunc func(*shipr.Shipr, ResponseWriter, *Request)

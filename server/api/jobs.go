@@ -42,18 +42,18 @@ func Jobs(jobs []*shipr.Job) []*job {
 }
 
 // JobsList responds with all jobs.
-func JobsList(c *shipr.Shipr, res *Response, req *Request) {
+func JobsList(c *shipr.Shipr, w ResponseWriter, r *Request) {
 	jobs, err := c.Jobs.All()
 	if err != nil {
 		panic(err)
 	}
-	res.Status(200)
-	res.Present(Jobs(jobs))
+	w.WriteHeader(200)
+	w.Encode(Jobs(jobs))
 }
 
 // JobsInfo responds with a single job.
-func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
-	id, err := strconv.Atoi(req.Var("id"))
+func JobsInfo(c *shipr.Shipr, w ResponseWriter, r *Request) {
+	id, err := strconv.Atoi(r.Var("id"))
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +63,7 @@ func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
 	}
 
 	if j == nil {
-		res.NotFound()
+		w.NotFound()
 		return
 	}
 
@@ -75,6 +75,6 @@ func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
 	resource := Job(j)
 	resource.Output = &output
 
-	res.Status(200)
-	res.Present(resource)
+	w.WriteHeader(200)
+	w.Encode(resource)
 }
