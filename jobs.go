@@ -57,7 +57,8 @@ func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
 // All returns all jobs.
 func (s *JobsService) All() ([]*Job, error) {
 	var jobs []*Job
-	return jobs, s.List("jobs", &jobs)
+	sql := `SELECT * FROM jobs`
+	return jobs, s.Select(&jobs, sql)
 }
 
 // Find finds a single job by id.

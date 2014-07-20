@@ -7,14 +7,15 @@ import (
 )
 
 type JobResource struct {
-	ID          int    `json:"id"`
-	Guid        int    `json:"guid"`
-	Sha         string `json:"sha"`
-	Ref         string `json:"ref"`
-	Environment string `json:"environment"`
-	Force       bool   `json:"force"`
-	ExitStatus  *int   `json:"exit_status"`
-	Status      string `json:"status"`
+	ID          int     `json:"id"`
+	Guid        int     `json:"guid"`
+	Sha         string  `json:"sha"`
+	Ref         string  `json:"ref"`
+	Environment string  `json:"environment"`
+	Force       bool    `json:"force"`
+	ExitStatus  *int    `json:"exit_status"`
+	Status      string  `json:"status"`
+	Output      *string `json:"output,omitempty"`
 }
 
 func NewJobResource(j *shipr.Job) *JobResource {
@@ -57,6 +58,14 @@ func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
 		return
 	}
 
+	output, err := c.LogLines.Output(job)
+	if err != nil {
+		panic(err)
+	}
+
+	resource := NewJobResource(job)
+	resource.Output = &output
+
 	res.Status(200)
-	res.Present(NewJobResource(job))
+	res.Present(resource)
 }

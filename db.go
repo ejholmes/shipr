@@ -20,7 +20,7 @@ type DB interface {
 	Get(table string, v interface{}, field string, value interface{}) error
 
 	// List of items into v.
-	List(table string, v interface{}) error
+	Select(v interface{}, sql string, values ...interface{}) error
 
 	// Close closes the database.
 	Close() error
@@ -75,9 +75,8 @@ func (d *db) Get(table string, v interface{}, field string, value interface{}) e
 	return d.Map.SelectOne(v, sql, value)
 }
 
-func (d *db) List(table string, v interface{}) error {
-	sql := `SELECT * FROM ` + table
-	_, err := d.Map.Select(v, sql)
+func (d *db) Select(v interface{}, sql string, values ...interface{}) error {
+	_, err := d.Map.Select(v, sql, values...)
 	return err
 }
 
