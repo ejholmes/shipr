@@ -19,8 +19,9 @@ gulp.task('javascripts', function() {
     .pipe(gulp.dest(build));
 });
 
-gulp.task('watch', ['javascripts'], function() {
+gulp.task('watch', ['javascripts', 'stylesheets'], function() {
   gulp.watch('javascripts/**/*.js', ['javascripts']);
+  gulp.watch('stylesheets/**/*.js', ['stylesheets']);
 });
 
 gulp.task('default', ['stylesheets', 'javascripts']);

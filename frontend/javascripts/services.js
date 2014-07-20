@@ -6,20 +6,11 @@
     'ngResource'
   ]);
 
-  /**
-   * A pusher client service.
-   */
-  module.factory('pusher', function($window) {
-    var api_key = $window.$("meta[name='pusher.key']").attr('content');
-
-    return new Pusher(api_key);
-  });
-
-  module.factory('Job', function($resource, jobEvents) {
+  module.factory('Job', function($resource) {
     var resource = $resource(
-      '/api/deploys/:jobId',
+      '/jobs/:jobId',
       { jobId: '@id' },
-      { restart: { method: 'POST', url: '/api/deploys/:jobId/restart' } }
+      { restart: { method: 'POST', url: '/jobs/:jobId/restart' } }
     );
 
     function Job(attributes){
@@ -114,35 +105,6 @@
     });
 
     return Job;
-  });
-
-  /**
-   * A service to bind pusher events to a job.
-   */
-  module.factory('jobEvents', function(pusher) {
-    var channels = {};
-
-    function subscribe(scope, job) {
-      var channel = channels[job.id] = channels[job.id] || pusher.subscribe('private-job-' + job.id);
-
-      channel.bind('output', function(data) {
-        scope.$apply(function() {
-          job.appendOutput(data.output);
-        });
-      });
-
-      channel.bind('complete', function(data) {
-        scope.$apply(function() {
-          job.setAttributes(data);
-        });
-      });
-
-      return job;
-    };
-
-    return {
-      subscribe: subscribe
-    };
   });
 
 })(angular);

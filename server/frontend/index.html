@@ -1,11 +1,104 @@
+
 <!DOCTYPE html>
 <html>
   <head>
+    <script src='//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js'></script>
+    <script src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.js'></script>
+    <script src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-resource.js'></script>
+    <script src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular-sanitize.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.0/angular-ui-router.min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js'></script>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jq-console/2.7.7/jqconsole.min.js'></script>
     <meta charset='utf-8'>
     <title>Shipr - We'll do it live!</title>
     <meta content='width=device-width, initial-scale=1.0' name='viewport'>
+    <link href='//netdna.bootstrapcdn.com/bootswatch/3.1.0/flatly/bootstrap.min.css' rel='stylesheet'>
+    <link href='/app.css' rel='stylesheet'>
+    <script src='/app.js'></script>
   </head>
-  <body>
-    Hello World
+  <body id='app' ng-app='app' ng-init='user = {"username":"ejholmes","gravatar":"http://www.gravatar.com/avatar/0f9f17758e76da17ff4ade389e566321"}'>
+    <div ui-view='header'></div>
+    <div ui-view='content'>
+      <div id='loading'>
+        <img src='https://s3.amazonaws.com/ejholmes.github.com/doitlive.jpg'>
+        <div class='spinner'></div>
+      </div>
+    </div>
+    <script id='header.html' type='text/ng-template'>
+      <div class='navbar navbar-default navbar-static-top' id='header'>
+        <div class='container'>
+          <div class='navbar-header'>
+            <a class='navbar-brand' href='' ui-sref='app.jobs.list'>Shipr</a>
+          </div>
+          <div class='navbar-collapse collapse'>
+            <ul class='nav navbar-nav navbar-right'>
+              <li class='user'>
+                <a href='' ng-bind='user.username'></a>
+                <img class='gravatar' ng-src='{{user.gravatar}}'>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </script>
+    <script id='content.html' type='text/ng-template'>
+      <div class='container' ui-view></div>
+    </script>
+    <script id='jobs.html' type='text/ng-template'>
+      <div ui-view></div>
+    </script>
+    <script id='jobs/list.html' type='text/ng-template'>
+      <h2 class='page-header'>Deploys</h2>
+      <table class='table table-striped'>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Sha</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="job in jobs | orderBy:'id':true">
+            <td>
+              <a href='' ng-bind='job.id' ui-sref='app.jobs.detail({ jobId: job.id })'></a>
+            </td>
+            <td ng-bind='job.sha'></td>
+          </tr>
+        </tbody>
+      </table>
+    </script>
+    <script id='jobs/detail.html' type='text/ng-template'>
+      <div class='job'>
+        <header class='job__header'>
+          <h1 class='job__status'>
+            <span ng-class="{ 'is-queued': job.isQueued(), 'is-deploying': job.isDeploying() }" ng-if='job.isQueued() || job.isDeploying()'>
+              <div class='spinner'></div>
+              <span ng-if='job.isQueued()'>Queued</span>
+              <span ng-if='job.isDeploying()'>Deploying</span>
+            </span>
+            <span class='is-done' ng-if='job.isDeployed()'>Deployed</span>
+            <span class='is-failed' ng-if='job.isFailed()'>Failed</span>
+          </h1>
+          <p class='job__destination'>
+            <strong ng-bind='job.sha'></strong>
+            &#8674;
+            <strong ng-bind='job.environment'></strong>
+          </p>
+        </header>
+        <div class='panel panel-primary' ng-if='job.config'>
+          <div class='panel-heading'>
+            <span ng-bind='job.repo.name'></span>
+            <a class='restart btn btn-info btn-xs pull-right' href='' ng-click='restart()' ng-if='job.done'>Restart</a>
+          </div>
+          <div class='panel-body'>
+            <div environment-variables='job.config'></div>
+          </div>
+        </div>
+        <div class='job__not-started' ng-if='!job.isStarted()'>
+          <strong>Hang Tight!</strong>
+          Your logs should be showing up shortly
+        </div>
+        <div class='job__log' id='log' ng-bind-html='job.output | ansi' ng-if='job.isStarted()' sticky='job.output'></div>
+      </div>
+    </script>
   </body>
 </html>

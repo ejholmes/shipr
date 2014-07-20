@@ -28,6 +28,8 @@ func NewJobResource(j *shipr.Job) *JobResource {
 }
 
 func JobsList(c *shipr.Shipr, res *Response, req *Request) {
+	res.Status(200)
+	res.Present([]string{})
 }
 
 func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {

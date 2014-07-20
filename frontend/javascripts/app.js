@@ -51,6 +51,12 @@
       });
   });
 
+  module.config(function($httpProvider) {
+    $httpProvider.defaults.headers.common = {
+      'Accept': 'application/vnd.shipr+json; version=1'
+    }
+  });
+
   module.run(function($rootScope, $log) {
     $rootScope.$on('$stateChangeError', function(event, toState, toParams, fromState, fromParams, error) {
       $log.error(error);
