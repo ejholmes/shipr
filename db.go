@@ -77,11 +77,7 @@ func (d *db) Close() error {
 }
 
 func (d *db) Reset() error {
-	_, err := d.Map.Exec(`truncate table repos restart identity cascade`)
-	if err != nil {
-		return err
-	}
-	_, err = d.Map.Exec(`truncate table jobs restart identity cascade`)
+	_, err := d.Map.Exec(`truncate table repos, jobs restart identity cascade`)
 	return err
 }
 
