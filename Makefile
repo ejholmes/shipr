@@ -1,4 +1,4 @@
-.PHONY: down up build test
+.PHONY: down up build test frontend
 
 test:
 	godep go test ./...
@@ -16,6 +16,9 @@ up:
 
 build:
 	godep go build -o build/shipr github.com/remind101/shipr/server/shipr
+
+frontend:
+	cd frontend && npm install && gulp
 
 run: build
 	build/shipr
