@@ -19,6 +19,9 @@ type DB interface {
 	// Get finds a Model by `field` with the value `value`.
 	Get(table string, v interface{}, field string, value interface{}) error
 
+	// List of items into v.
+	List(table string, v interface{}) error
+
 	// Close closes the database.
 	Close() error
 
@@ -70,6 +73,12 @@ func (d *db) Update(v interface{}) error {
 func (d *db) Get(table string, v interface{}, field string, value interface{}) error {
 	sql := `SELECT * FROM ` + table + ` WHERE ` + field + ` = $1 LIMIT 1`
 	return d.Map.SelectOne(v, sql, value)
+}
+
+func (d *db) List(table string, v interface{}) error {
+	sql := `SELECT * FROM ` + table
+	_, err := d.Map.Select(v, sql)
+	return err
 }
 
 func (d *db) Close() error {

@@ -40,6 +40,12 @@ func (s *JobsService) CreateFromDescription(d Description) (*Job, error) {
 	return job, s.Insert(job)
 }
 
+// All returns all jobs.
+func (s *JobsService) All() ([]*Job, error) {
+	var jobs []*Job
+	return jobs, s.List("jobs", &jobs)
+}
+
 // Find finds a single job by id.
 func (s *JobsService) Find(id int) (*Job, error) {
 	return s.findBy("id", id)

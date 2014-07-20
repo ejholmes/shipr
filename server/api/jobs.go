@@ -28,8 +28,16 @@ func NewJobResource(j *shipr.Job) *JobResource {
 }
 
 func JobsList(c *shipr.Shipr, res *Response, req *Request) {
+	jobs, err := c.Jobs.All()
+	if err != nil {
+		panic(err)
+	}
+	r := make([]*JobResource, len(jobs))
+	for i, j := range jobs {
+		r[i] = NewJobResource(j)
+	}
 	res.Status(200)
-	res.Present([]string{})
+	res.Present(r)
 }
 
 func JobsInfo(c *shipr.Shipr, res *Response, req *Request) {
