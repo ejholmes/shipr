@@ -1,6 +1,10 @@
 package github
 
 import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/ejholmes/buble"
@@ -24,6 +28,28 @@ type Request struct {
 	*buble.Request
 }
 
+// Authentic returns true if the calculated signature matches the
+// signature from the request headers.
+func (r *Request) Authentic(secret string) bool {
+	sig, err := r.signature(secret)
+	if err != nil {
+		panic(err)
+	}
+	return r.Header.Get(SigHeader) == "sha1="+sig
+}
+
+// signature calculates the HMAC signature of the request body using the secret.
+func (r *Request) signature(secret string) (string, error) {
+	raw, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return "", nil
+	}
+
+	mac := hmac.New(sha1.New, []byte(secret))
+	mac.Write(raw)
+	return fmt.Sprintf("%x", mac.Sum(nil)), nil
+}
+
 // HandlerFunc defines the method signature for event handlers.
 type HandlerFunc func(Shipr, ResponseWriter, *Request)
 
@@ -45,11 +71,16 @@ type Shipr interface {
 type GitHub struct {
 	shipr  Shipr
 	router *mux.Router
+	secret string
 }
 
 // New returns a new Handler.
-func New(sh Shipr) *GitHub {
-	h := &GitHub{shipr: sh, router: mux.NewRouter()}
+func New(sh Shipr, secret string) *GitHub {
+	h := &GitHub{
+		shipr:  sh,
+		router: mux.NewRouter(),
+		secret: secret,
+	}
 
 	// Handlers
 	h.Handle("deployment", Deployment)
@@ -64,6 +95,13 @@ func (g *GitHub) Handle(event string, fn HandlerFunc) {
 		HandlerFunc: func(w buble.ResponseWriter, r *buble.Request) {
 			resp := &Response{ResponseWriter: w}
 			req := &Request{Request: r}
+
+			// Ensure that the provided signature matches the calculated signature.
+			if !req.Authentic(g.secret) {
+				w.WriteHeader(403)
+				return
+			}
+
 			fn(g.shipr, resp, req)
 		},
 	}
