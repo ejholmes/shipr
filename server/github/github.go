@@ -9,53 +9,62 @@ import (
 	"github.com/remind101/shipr"
 )
 
-// EventHeader is the name of the header that determines what type of event this is.
-const EventHeader = "X-GitHub-Event"
+const (
+	// EventHeader is the name of the header that determines what type of event this is.
+	EventHeader = "X-GitHub-Event"
 
-// Handler demuxes incoming webhooks from GitHub and handles them.
-type Handler struct {
-	http.Handler
+	// SigHeader is the name of the header that contains the sha1 of the payload.
+	SigHeader = "X-Hub-Signature"
+)
+
+// GitHub demuxes incoming webhooks from GitHub and handles them.
+type GitHub struct {
+	router *mux.Router
 }
 
 // New returns a new Handler.
-func New(c *shipr.Shipr) http.Handler {
-	m := mux.NewRouter()
-	h := &Handler{m}
+func New(sh *shipr.Shipr) http.Handler {
+	r := mux.NewRouter()
+	h := &GitHub{router: r}
 
 	var handlers = map[string]http.Handler{
-		"deployment":        &DeploymentHandler{c},
-		"deployment_status": &DeploymentStatusHandler{c},
+		"deployment":        &DeploymentHandler{shipr: sh},
+		"deployment_status": &DeploymentStatusHandler{shipr: sh},
 	}
 
 	for event, handler := range handlers {
-		m.Methods("POST").Headers(EventHeader, event).Handler(handler)
+		r.Methods("POST").Headers(EventHeader, event).Handler(handler)
 	}
 
 	return h
 }
 
+func (h *GitHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.router.ServeHTTP(w, r)
+}
+
 // DeploymentHandler handles "deployment" events.
 type DeploymentHandler struct {
-	*shipr.Shipr
+	shipr *shipr.Shipr
 }
 
 func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var d github.Deployment
 	decodeRequest(r, &d)
 
-	h.Deploy(&description{&d})
+	h.shipr.Deploy(&description{&d})
 }
 
 // DeploymentStatusHandler handles "deployment_status" events.
 type DeploymentStatusHandler struct {
-	*shipr.Shipr
+	shipr *shipr.Shipr
 }
 
 func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var d github.DeploymentStatus
 	decodeRequest(r, &d)
 
-	h.Notify(newNotification(&d))
+	h.shipr.Notify(newNotification(&d))
 }
 
 func decodeRequest(r *http.Request, v interface{}) {
