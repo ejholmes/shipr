@@ -51,6 +51,14 @@ func Test_GitHub(t *testing.T) {
 		{
 			payload:   "deployment_status.success.json",
 			event:     "deployment_status",
+			signature: "sha1=invalid",
+			expected: expectation{
+				status: 403,
+			},
+		},
+		{
+			payload:   "deployment_status.success.json",
+			event:     "deployment_status",
 			signature: "sha1=a57b521fd15ab4542f729b816f27226277d446aa",
 			expected: expectation{
 				status: 200,
