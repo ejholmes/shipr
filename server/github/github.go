@@ -189,11 +189,11 @@ func newDeploymentStatus(d *github.DeploymentStatus) *deploymentStatus {
 }
 
 func (n *deploymentStatus) RepoName() shipr.RepoName {
-	return shipr.RepoName("TODO")
+	return shipr.RepoName(util.SafeString(n.GitHubDeploymentStatus.Repository.FullName))
 }
 
 func (n *deploymentStatus) URL() *url.URL {
-	u, err := url.Parse("http://www.google.com")
+	u, err := url.Parse(util.SafeString(n.GitHubDeploymentStatus.TargetURL))
 	if err != nil {
 		panic(err)
 	}
@@ -201,7 +201,7 @@ func (n *deploymentStatus) URL() *url.URL {
 }
 
 func (n *deploymentStatus) User() string {
-	return "TODO"
+	return util.SafeString(n.GitHubDeploymentStatus.Deployment.Creator.Login)
 }
 
 func (n *deploymentStatus) State() string {

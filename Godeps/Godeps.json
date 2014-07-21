@@ -29,8 +29,12 @@
 			"Rev": "32a45d9c74f42c1db41db5d4261760a613832a3d"
 		},
 		{
+			"ImportPath": "github.com/ejholmes/buble",
+			"Rev": "bc48710d0283cd105f416f1b9f4951e4714e82aa"
+		},
+		{
 			"ImportPath": "github.com/ejholmes/go-github/github",
-			"Rev": "da2847f95d2ffac63e02dc7e83b7412e5a18d4b4"
+			"Rev": "338b5192fc07b2eff030f73d98aca1408642d8c9"
 		},
 		{
 			"ImportPath": "github.com/ejholmes/heroku-go/v3",
