@@ -17,13 +17,19 @@ const (
 	SigHeader = "X-Hub-Signature"
 )
 
+// Shipr is an interface that declares the methods we use from shipr.
+type Shipr interface {
+	Deploy(shipr.Description) error
+	Notify(shipr.Notification) error
+}
+
 // GitHub demuxes incoming webhooks from GitHub and handles them.
 type GitHub struct {
 	router *mux.Router
 }
 
 // New returns a new Handler.
-func New(sh *shipr.Shipr) http.Handler {
+func New(sh Shipr) *GitHub {
 	r := mux.NewRouter()
 	h := &GitHub{router: r}
 
@@ -45,26 +51,36 @@ func (h *GitHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // DeploymentHandler handles "deployment" events.
 type DeploymentHandler struct {
-	shipr *shipr.Shipr
+	shipr Shipr
 }
 
 func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var d github.Deployment
 	decodeRequest(r, &d)
 
-	h.shipr.Deploy(&description{&d})
+	err := h.shipr.Deploy(&description{&d})
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(200)
 }
 
 // DeploymentStatusHandler handles "deployment_status" events.
 type DeploymentStatusHandler struct {
-	shipr *shipr.Shipr
+	shipr Shipr
 }
 
 func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var d github.DeploymentStatus
 	decodeRequest(r, &d)
 
-	h.shipr.Notify(newNotification(&d))
+	err := h.shipr.Notify(newNotification(&d))
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(200)
 }
 
 func decodeRequest(r *http.Request, v interface{}) {
