@@ -1,13 +1,31 @@
 package github
 
 import (
-	"encoding/json"
 	"net/http"
 
+	"github.com/ejholmes/buble"
 	"github.com/ejholmes/go-github/github"
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
 )
+
+// ResponseWriter wraps a buble.ResponseWriter.
+type ResponseWriter interface {
+	buble.ResponseWriter
+}
+
+// Response wraps a buble.Response.
+type Response struct {
+	buble.ResponseWriter
+}
+
+// Request wraps a buble.Request.
+type Request struct {
+	*buble.Request
+}
+
+// HandlerFunc defines the method signature for event handlers.
+type HandlerFunc func(Shipr, ResponseWriter, *Request)
 
 const (
 	// EventHeader is the name of the header that determines what type of event this is.
@@ -25,40 +43,43 @@ type Shipr interface {
 
 // GitHub demuxes incoming webhooks from GitHub and handles them.
 type GitHub struct {
+	shipr  Shipr
 	router *mux.Router
 }
 
 // New returns a new Handler.
 func New(sh Shipr) *GitHub {
-	r := mux.NewRouter()
-	h := &GitHub{router: r}
+	h := &GitHub{shipr: sh, router: mux.NewRouter()}
 
-	var handlers = map[string]http.Handler{
-		"deployment":        &DeploymentHandler{shipr: sh},
-		"deployment_status": &DeploymentStatusHandler{shipr: sh},
-	}
-
-	for event, handler := range handlers {
-		r.Methods("POST").Headers(EventHeader, event).Handler(handler)
-	}
+	// Handlers
+	h.Handle("deployment", Deployment)
+	h.Handle("deployment_status", DeploymentStatus)
 
 	return h
 }
 
-func (h *GitHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.router.ServeHTTP(w, r)
+// Handle maps an event to a HandlerFunc.
+func (g *GitHub) Handle(event string, fn HandlerFunc) {
+	h := &buble.Handler{
+		HandlerFunc: func(w buble.ResponseWriter, r *buble.Request) {
+			resp := &Response{ResponseWriter: w}
+			req := &Request{Request: r}
+			fn(g.shipr, resp, req)
+		},
+	}
+	g.router.Methods("POST").Headers(EventHeader, event).Handler(h)
 }
 
-// DeploymentHandler handles "deployment" events.
-type DeploymentHandler struct {
-	shipr Shipr
+func (g *GitHub) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	g.router.ServeHTTP(w, r)
 }
 
-func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// Deployment handles "deployment" events.
+func Deployment(sh Shipr, w ResponseWriter, r *Request) {
 	var d github.Deployment
-	decodeRequest(r, &d)
+	r.Decode(&d)
 
-	err := h.shipr.Deploy(&description{&d})
+	err := sh.Deploy(&description{&d})
 	if err != nil {
 		panic(err)
 	}
@@ -66,26 +87,15 @@ func (h *DeploymentHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 }
 
-// DeploymentStatusHandler handles "deployment_status" events.
-type DeploymentStatusHandler struct {
-	shipr Shipr
-}
-
-func (h *DeploymentStatusHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// DeploymentStatus handles "deployment_status" events.
+func DeploymentStatus(sh Shipr, w ResponseWriter, r *Request) {
 	var d github.DeploymentStatus
-	decodeRequest(r, &d)
+	r.Decode(&d)
 
-	err := h.shipr.Notify(newNotification(&d))
+	err := sh.Notify(newNotification(&d))
 	if err != nil {
 		panic(err)
 	}
 
 	w.WriteHeader(200)
-}
-
-func decodeRequest(r *http.Request, v interface{}) {
-	err := json.NewDecoder(r.Body).Decode(v)
-	if err != nil {
-		panic(err)
-	}
 }
