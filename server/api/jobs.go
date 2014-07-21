@@ -45,7 +45,8 @@ func Jobs(jobs []*shipr.Job) []*job {
 func JobsList(c *shipr.Shipr, w ResponseWriter, r *Request) {
 	jobs, err := c.Jobs.All()
 	if err != nil {
-		panic(err)
+		w.Error(&Error{error: err, Status: 400})
+		return
 	}
 	w.WriteHeader(200)
 	w.Encode(Jobs(jobs))
@@ -55,11 +56,13 @@ func JobsList(c *shipr.Shipr, w ResponseWriter, r *Request) {
 func JobsInfo(c *shipr.Shipr, w ResponseWriter, r *Request) {
 	id, err := strconv.Atoi(r.Var("id"))
 	if err != nil {
-		panic(err)
+		w.BadRequest()
+		return
 	}
 	j, err := c.Jobs.Find(id)
 	if err != nil {
-		panic(err)
+		w.Error(&Error{error: err, Status: 400})
+		return
 	}
 
 	if j == nil {

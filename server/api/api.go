@@ -9,6 +9,14 @@ import (
 	"github.com/remind101/shipr"
 )
 
+var (
+	// ErrNotFound is an error that represents a 404 error.
+	ErrNotFound = &Error{error: errors.New("Not Found"), Status: 404}
+
+	// ErrBadRequest is an error that represents a 400 error.
+	ErrBadRequest = &Error{error: errors.New("Bad Request"), Status: 400}
+)
+
 // API implements the http.ServeHTTP interface for serving up the api.
 type API struct {
 	shipr  *shipr.Shipr
@@ -55,16 +63,13 @@ type ErrorResponse struct {
 	Error *Error `json:"error"`
 }
 
-var (
-	// ErrNotFound is an error that represents a 404 error.
-	ErrNotFound = &Error{error: errors.New("Not Found"), Status: 404}
-)
-
 // ResponseWriter wraps an http.ResponseWriter with convenience methods.
 type ResponseWriter interface {
 	buble.ResponseWriter
+
 	Error(*Error)
 	NotFound()
+	BadRequest()
 }
 
 // Response wraps a buble.Response.
@@ -79,9 +84,14 @@ func (r *Response) Error(err *Error) {
 	r.Encode(&ErrorResponse{Error: err})
 }
 
-// NotFound returns with an ErrNotFound response.
+// NotFound responds with an ErrNotFound response.
 func (r *Response) NotFound() {
 	r.Error(ErrNotFound)
+}
+
+// BadRequest resposne with an ErrBadRequest response.
+func (r *Response) BadRequest() {
+	r.Error(ErrBadRequest)
 }
 
 // Request wraps a buble.Request.
