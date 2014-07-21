@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/ejholmes/buble"
 	"github.com/ejholmes/go-github/github"
 	"github.com/gorilla/mux"
 	"github.com/remind101/shipr"
+	"github.com/remind101/shipr/util"
 )
 
 // ResponseWriter wraps a buble.ResponseWriter.
@@ -117,7 +119,7 @@ func Deployment(sh Shipr, w ResponseWriter, r *Request) {
 	var d github.Deployment
 	r.Decode(&d)
 
-	err := sh.Deploy(&description{&d})
+	err := sh.Deploy(newDeployment(&d))
 	if err != nil {
 		panic(err)
 	}
@@ -130,10 +132,78 @@ func DeploymentStatus(sh Shipr, w ResponseWriter, r *Request) {
 	var d github.DeploymentStatus
 	r.Decode(&d)
 
-	err := sh.Notify(newNotification(&d))
+	err := sh.Notify(newDeploymentStatus(&d))
 	if err != nil {
 		panic(err)
 	}
 
 	w.WriteHeader(200)
+}
+
+// deployment wraps a github.Deployment to implement the shipr.Description interface.
+type deployment struct {
+	GitHubDeployment *github.Deployment
+}
+
+// NewDeployment returns a new Deployment.
+func newDeployment(d *github.Deployment) *deployment {
+	return &deployment{GitHubDeployment: d}
+}
+
+func (d *deployment) Guid() int {
+	return *d.GitHubDeployment.ID
+}
+
+func (d *deployment) RepoName() shipr.RepoName {
+	return shipr.RepoName(util.SafeString(d.GitHubDeployment.Repository.FullName))
+}
+
+func (d *deployment) Sha() string {
+	return util.SafeString(d.GitHubDeployment.Sha)
+}
+
+func (d *deployment) Ref() string {
+	return util.SafeString(d.GitHubDeployment.Ref)
+}
+
+func (d *deployment) Environment() string {
+	return util.SafeString(d.GitHubDeployment.Environment)
+}
+
+func (d *deployment) Description() string {
+	return util.SafeString(d.GitHubDeployment.Description)
+}
+
+// deploymentStatus wraps a github.DeploymentStatus
+type deploymentStatus struct {
+	*deployment
+	GitHubDeploymentStatus *github.DeploymentStatus
+}
+
+// newDeploymentStatus returns a new DeploymentStatus.
+func newDeploymentStatus(d *github.DeploymentStatus) *deploymentStatus {
+	return &deploymentStatus{
+		deployment:             newDeployment(d.Deployment),
+		GitHubDeploymentStatus: d,
+	}
+}
+
+func (n *deploymentStatus) RepoName() shipr.RepoName {
+	return shipr.RepoName("TODO")
+}
+
+func (n *deploymentStatus) URL() *url.URL {
+	u, err := url.Parse("http://www.google.com")
+	if err != nil {
+		panic(err)
+	}
+	return u
+}
+
+func (n *deploymentStatus) User() string {
+	return "TODO"
+}
+
+func (n *deploymentStatus) State() string {
+	return util.SafeString(n.GitHubDeploymentStatus.State)
 }
