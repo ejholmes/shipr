@@ -6,10 +6,10 @@ var gulp    = require('gulp'),
     merge   = require('merge-stream');
 
 var paths = {
-  dest: '../server/frontend',
-  scripts: 'javascripts/**/*.js',
+  dest:        '../server/frontend',
+  scripts:     'javascripts/**/*.js',
   stylesheets: 'stylesheets/**/*.scss',
-  templates: 'templates/**/*.html'
+  templates:   'templates/**/*.html'
 };
 
 gulp.task('sass', function() {
