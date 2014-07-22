@@ -1,0 +1,25 @@
+{
+  "name": "shipr",
+  "description": "Rest API and AngularJS client for deploying git repos.",
+  "website": "https://github.com/remind101/shipr",
+  "repository": "https://github.com/remind101/shipr",
+  "succcess_url": "/",
+  "addons": ["heroku-postgresql:hobby-dev"],
+  "env": {
+    "BUILDPACK_URL": "https://github.com/kr/heroku-buildpack-go.git",
+    "GOENV": "production",
+    "SHIPR_GITHUB_TOKEN": {
+      "description": "The GitHub api token.",
+      "required": true,
+      "value": ""
+    },
+    "SHIPR_HEROKU_TOKEN": {
+      "description": "The Heroku api token.",
+      "required": true,
+      "value": ""
+    }
+  },
+  "scripts": {
+    "postdeploy": "goose -env $GOENV up"
+  }
+}
