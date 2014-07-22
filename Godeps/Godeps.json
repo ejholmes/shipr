@@ -6,6 +6,10 @@
 	],
 	"Deps": [
 		{
+			"ImportPath": "bitbucket.org/liamstask/goose/cmd/goose",
+			"Rev": "e885648f5ad6e48f7d7532b9c0b21767333d50ab"
+		},
+		{
 			"ImportPath": "bitbucket.org/liamstask/goose/lib/goose",
 			"Rev": "e885648f5ad6e48f7d7532b9c0b21767333d50ab"
 		},
