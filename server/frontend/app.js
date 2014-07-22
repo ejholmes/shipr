@@ -1,3 +1,16 @@
+(function(module) {
+try {
+  module = angular.module('templates');
+} catch (e) {
+  module = angular.module('templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('content.html',
+    '<div class="container" ui-view></div>\n' +
+    '');
+}]);
+})();
+
 // ansi_up.js
 // version : 1.0.0
 // author : Dru Nelson
@@ -144,6 +157,34 @@
     }
 })(Date);
 
+(function(module) {
+try {
+  module = angular.module('templates');
+} catch (e) {
+  module = angular.module('templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('header.html',
+    '\n' +
+    '<div class="navbar navbar-default navbar-static-top" id="header">\n' +
+    '  <div class="container">\n' +
+    '    <div class="navbar-header">\n' +
+    '      <a class="navbar-brand" href="" ui-sref="app.jobs.list">Shipr</a>\n' +
+    '    </div>\n' +
+    '    <div class="navbar-collapse collapse">\n' +
+    '      <ul class="nav navbar-nav navbar-right">\n' +
+    '        <li class="user">\n' +
+    '        <a href="" ng-bind="user.username"></a>\n' +
+    '        <img class="gravatar" ng-src="{{user.gravatar}}">\n' +
+    '        </li>\n' +
+    '      </ul>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
+
 (function(angular) {
   'use strict';
 
@@ -151,6 +192,7 @@
     'ng',
     'ngSanitize',
     'ui.router',
+    'templates',
     'app.directives',
     'app.services',
     'app.filters',
@@ -211,6 +253,19 @@
 
 })(angular);
 
+(function(module) {
+try {
+  module = angular.module('templates');
+} catch (e) {
+  module = angular.module('templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('jobs.html',
+    '<div ui-view></div>\n' +
+    '');
+}]);
+})();
+
 (function(angular) {
   'use strict';
 
@@ -233,6 +288,50 @@
   });
 
 })(angular);
+
+(function(module) {
+try {
+  module = angular.module('templates');
+} catch (e) {
+  module = angular.module('templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('jobs/detail.html',
+    '<div class="job">\n' +
+    '  <header class="job__header">\n' +
+    '    <h1 class="job__status">\n' +
+    '      <span ng-class="{ \'is-queued\': job.isQueued(), \'is-deploying\': job.isDeploying() }" ng-if="job.isQueued() || job.isDeploying()">\n' +
+    '        <div class="spinner"></div>\n' +
+    '        <span ng-if="job.isQueued()">Queued</span>\n' +
+    '        <span ng-if="job.isDeploying()">Deploying</span>\n' +
+    '      </span>\n' +
+    '      <span class="is-done" ng-if="job.isDeployed()">Deployed</span>\n' +
+    '      <span class="is-failed" ng-if="job.isFailed()">Failed</span>\n' +
+    '    </h1>\n' +
+    '    <p class="job__destination">\n' +
+    '    <strong ng-bind="job.ref" title="{{ job.sha }}"></strong>\n' +
+    '    &#8674;\n' +
+    '    <strong ng-bind="job.environment"></strong>\n' +
+    '    </p>\n' +
+    '  </header>\n' +
+    '  <div class="panel panel-primary" ng-if="job.config">\n' +
+    '    <div class="panel-heading">\n' +
+    '      <span ng-bind="job.repo.name"></span>\n' +
+    '      <a class="restart btn btn-info btn-xs pull-right" href="" ng-click="restart()" ng-if="job.done">Restart</a>\n' +
+    '    </div>\n' +
+    '    <div class="panel-body">\n' +
+    '      <div environment-variables="job.config"></div>\n' +
+    '    </div>\n' +
+    '  </div>\n' +
+    '  <div class="job__not-started" ng-if="!job.isStarted()">\n' +
+    '    <strong>Hang Tight!</strong>\n' +
+    '    Your logs should be showing up shortly\n' +
+    '  </div>\n' +
+    '  <div class="job__log" id="log" ng-bind-html="job.output | ansi" ng-if="job.isStarted()" sticky="job.output"></div>\n' +
+    '</div>\n' +
+    '');
+}]);
+})();
 
 (function(angular) {
   'use strict';
@@ -301,6 +400,35 @@
   });
 
 })(angular);
+
+(function(module) {
+try {
+  module = angular.module('templates');
+} catch (e) {
+  module = angular.module('templates', []);
+}
+module.run(['$templateCache', function($templateCache) {
+  $templateCache.put('jobs/list.html',
+    '<h2 class="page-header">Deploys</h2>\n' +
+    '<table class="table table-striped">\n' +
+    '  <thead>\n' +
+    '    <tr>\n' +
+    '      <th>#</th>\n' +
+    '      <th>Sha</th>\n' +
+    '    </tr>\n' +
+    '  </thead>\n' +
+    '  <tbody>\n' +
+    '  <tr ng-repeat="job in jobs | orderBy:\'id\':true">\n' +
+    '    <td>\n' +
+    '      <a href="" ng-bind="job.id" ui-sref="app.jobs.detail({ jobId: job.id })"></a>\n' +
+    '    </td>\n' +
+    '    <td ng-bind="job.sha"></td>\n' +
+    '  </tr>\n' +
+    '  </tbody>\n' +
+    '</table>\n' +
+    '');
+}]);
+})();
 
 (function(angular) {
   'use strict';

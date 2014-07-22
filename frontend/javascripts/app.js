@@ -5,6 +5,7 @@
     'ng',
     'ngSanitize',
     'ui.router',
+    'templates',
     'app.directives',
     'app.services',
     'app.filters',

@@ -1,0 +1,32 @@
+<div class="job">
+  <header class="job__header">
+    <h1 class="job__status">
+      <span ng-class="{ 'is-queued': job.isQueued(), 'is-deploying': job.isDeploying() }" ng-if="job.isQueued() || job.isDeploying()">
+        <div class="spinner"></div>
+        <span ng-if="job.isQueued()">Queued</span>
+        <span ng-if="job.isDeploying()">Deploying</span>
+      </span>
+      <span class="is-done" ng-if="job.isDeployed()">Deployed</span>
+      <span class="is-failed" ng-if="job.isFailed()">Failed</span>
+    </h1>
+    <p class="job__destination">
+    <strong ng-bind="job.ref" title="{{ job.sha }}"></strong>
+    &#8674;
+    <strong ng-bind="job.environment"></strong>
+    </p>
+  </header>
+  <div class="panel panel-primary" ng-if="job.config">
+    <div class="panel-heading">
+      <span ng-bind="job.repo.name"></span>
+      <a class="restart btn btn-info btn-xs pull-right" href="" ng-click="restart()" ng-if="job.done">Restart</a>
+    </div>
+    <div class="panel-body">
+      <div environment-variables="job.config"></div>
+    </div>
+  </div>
+  <div class="job__not-started" ng-if="!job.isStarted()">
+    <strong>Hang Tight!</strong>
+    Your logs should be showing up shortly
+  </div>
+  <div class="job__log" id="log" ng-bind-html="job.output | ansi" ng-if="job.isStarted()" sticky="job.output"></div>
+</div>
