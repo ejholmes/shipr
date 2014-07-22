@@ -5,36 +5,41 @@ var gulp    = require('gulp'),
     html2js = require('gulp-ng-html2js'),
     merge   = require('merge-stream');
 
-var build = '../server/frontend';
+var paths = {
+  dest: '../server/frontend',
+  scripts: 'javascripts/**/*.js',
+  stylesheets: 'stylesheets/**/*.scss',
+  templates: 'templates/**/*.html'
+};
 
 gulp.task('sass', function() {
-  return gulp.src('stylesheets/**/*.scss')
+  return gulp.src(paths.stylesheets)
     .pipe(sass())
-    .pipe(gulp.dest(build))
+    .pipe(gulp.dest(paths.dest))
 });
 
 gulp.task('stylesheets', ['sass']);
 
 gulp.task('javascripts', function() {
-  var templates = gulp.src('templates/**/*.html')
+  var templates = gulp.src(paths.templates)
     .pipe(html2js({ moduleName: 'templates' }));
 
-  var scripts = gulp.src('javascripts/**/*.js');
+  var scripts = gulp.src(paths.scripts);
 
   return merge(scripts, templates)
     .pipe(concat('app.js'))
-    .pipe(gulp.dest(build));
+    .pipe(gulp.dest(paths.dest));
 });
 
 gulp.task('html', function() {
   return gulp.src('index.html')
-    .pipe(gulp.dest(build));
+    .pipe(gulp.dest(paths.dest));
 });
 
 gulp.task('watch', ['javascripts', 'stylesheets', 'html'], function() {
-  gulp.watch('javascripts/**/*.js', ['javascripts']);
-  gulp.watch('templates/**/*.html', ['javascripts']);
-  gulp.watch('stylesheets/**/*.js', ['stylesheets']);
+  gulp.watch(paths.scripts, ['javascripts']);
+  gulp.watch(paths.templates, ['javascripts']);
+  gulp.watch(paths.stylesheets, ['stylesheets']);
   gulp.watch('index.html', ['html']);
 });
 
